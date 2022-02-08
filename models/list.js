@@ -10,6 +10,10 @@ const schema = new Schema({
         type: String,
         required: true
     },
+    isArchieved : {
+        type: Boolean,
+        default: false
+    },
     createdAt : {
         type: Date,
         default : Date.now()

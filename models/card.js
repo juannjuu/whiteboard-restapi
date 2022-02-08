@@ -59,7 +59,6 @@ const schema = new Schema({
     },
     labels: {
         type: Array,
-        // default: ['UI/UX', 'Development', 'Music']
     },
     comments: {
         type: [commentSchema]
