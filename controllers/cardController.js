@@ -1,4 +1,5 @@
 const Card = require('../models/card')
+const User = require('../models/user')
 
 module.exports = {
     async getAll(req, res) {
@@ -163,6 +164,32 @@ module.exports = {
         }
     },
 
+    async getAssignTo(req, res) {
+        try {
+            const getCard = await Card.findOne({
+                _id: req.params.cardId,
+            })
+
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+
+            res.status(201).send({
+                status: 201,
+                message: 'Data found!',
+                result: getCard.assignTo
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: 'Internal Server Error',
+                msgError: error
+            })
+        }
+    },
+
     async postAssignTo(req, res) {
         const cardId = req.params.cardId
         try {
@@ -177,7 +204,16 @@ module.exports = {
                 })
             }
 
-            const updateCard = await Card.updateOne({_id: cardId}, {assignTo: req.body.assignTo})
+            const updateCard = await Card.updateOne(
+                {
+                    _id: cardId
+                }, 
+                {
+                    $set: {
+                        assignTo: req.body.assignTo
+                    }
+                }
+            )
 
             res.status(201).send({
                 message: 'Update Succesfully',
@@ -193,7 +229,7 @@ module.exports = {
 
     async getUserTask(req, res) {
         try {
-            const findCard = await Card.findOne({
+            const findCard = await Card.find({
                 assignTo: {
                     $elemMatch: {
                         userId: req.params.userId
@@ -215,7 +251,7 @@ module.exports = {
         } catch (error) {
             res.status(500).json({
                 message: 'Internal Server Error',
-                msgError: error
+                msgError: error.message
             })
         }
     },
@@ -306,6 +342,10 @@ module.exports = {
     async postComment(req, res) {
         const cardId = req.params.cardId
         try {
+            const findUser = await User.findOne({
+                _id: '6201c9c5f026540254bdf702'
+            })
+
             const getCard = await Card.findOne({
                 _id: cardId
             })
@@ -317,11 +357,306 @@ module.exports = {
                 })
             }
 
-            const updateCard = await Card.updateOne({_id: cardId}, {comments: req.body.comments})
+            let comments = {
+                userId: findUser._id,
+                name: findUser.name,
+                comment: req.body.comment
+            }
+
+            const updateCard = await Card.updateOne(
+                {
+                    _id: cardId
+                }, 
+                {
+                    $push: {
+                        comments: comments
+                    }
+                }
+            )
 
             res.status(201).send({
                 message: 'Update Succesfully',
                 result: updateCard
+            })
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                msgError: error
+            })
+        }
+    },
+
+    async getChecklist(req, res) {
+        try {
+            const getCard = await Card.findOne({
+                _id: req.params.cardId,
+            })
+
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+
+            res.status(201).send({
+                status: 201,
+                message: 'Data found!',
+                result: getCard.checklist
+            })
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                msgError: error
+            })
+        }
+    },
+
+    async addChecklist(req, res) {
+        try {
+            const getCard = await Card.findOne({
+                _id: req.params.cardId,
+            })
+
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+
+            let check = {
+                name: req.body.name
+            }
+
+            const updateCard = await Card.updateOne(
+                {
+                    _id: req.params.cardId
+                }, 
+                {
+                    $push: {
+                        checklist: check
+                    }
+                }
+            )
+
+            res.status(201).send({
+                status: 201,
+                message: 'Data found!',
+                result: updateCard
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: 'Internal Server Error',
+                msgError: error.message
+            })
+        }
+    },
+
+    async renameChecklist(req, res) {
+        try {
+            const getCard = await Card.findOne({
+                checklist: {
+                    $elemMatch: {
+                        _id: req.params.checkId
+                    }
+                },
+            })
+
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+
+            const updateCard = await Card.updateOne(
+                {
+                    checklist: {
+                        $elemMatch: {
+                            _id: req.params.checkId
+                        }
+                    }
+                }, 
+                {
+                    $set: {
+                        'checklist.$.name': req.body.name
+                    }
+                }
+            )
+
+            res.status(201).send({
+                status: 201,
+                message: 'Data found!',
+                result: updateCard
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: 'Internal Server Error',
+                msgError: error.message
+            })
+        }
+    },
+
+    async deleteChecklist(req, res) {
+        try {
+            const getCard = await Card.findOne({
+                checklist: {
+                    $elemMatch: {
+                        _id: req.params.checkId
+                    }
+                },
+            })
+
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+
+            const updateCard = await Card.updateOne(
+                {
+                    checklist: {
+                        $elemMatch: {
+                            _id: req.params.checkId
+                        }
+                    }
+                }, 
+                {
+                    $pull: {
+                        'checklist': {
+                            _id: req.params.checkId
+                        } 
+                    }
+                }
+            )
+
+            res.status(201).send({
+                status: 201,
+                message: 'Data found!',
+                result: updateCard
+            })
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                msgError: error.message
+            })
+        }
+    },
+
+    async isCheck(req, res) {
+        try {
+            const getCard = await Card.findOne({
+                checklist: {
+                    $elemMatch: {
+                        _id: req.params.checkId
+                    }
+                },
+            })
+
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+
+            const updateCard = await Card.updateOne(
+                {
+                    checklist: {
+                        $elemMatch: {
+                            _id: req.params.checkId
+                        }
+                    }
+                }, 
+                {
+                    $set: {
+                        'checklist.$.isChecked': true
+                    }
+                }
+            )
+
+            res.status(201).send({
+                status: 201,
+                message: 'Data found!',
+                result: updateCard
+            })
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                msgError: error.message
+            })
+        }
+    },
+
+    async isUnCheck(req, res) {
+        try {
+            const getCard = await Card.findOne({
+                checklist: {
+                    $elemMatch: {
+                        _id: req.params.checkId
+                    }
+                },
+            })
+
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+
+            const updateCard = await Card.updateOne(
+                {
+                    checklist: {
+                        $elemMatch: {
+                            _id: req.params.checkId
+                        }
+                    }
+                }, 
+                {
+                    $set: {
+                        'checklist.$.isChecked': false
+                    }
+                }
+            )
+
+            res.status(201).send({
+                status: 201,
+                message: 'Data found!',
+                result: updateCard
+            })
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                msgError: error.message
+            })
+        }
+    },
+
+    async getAttachment(req, res) {
+        try {
+            const getCard = await Card.findOne({
+                _id: req.params.cardId,
+            })
+
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+
+            res.status(201).send({
+                status: 201,
+                message: 'Data found!',
+                result: getCard.attachment
             })
         } catch (error) {
             console.log(error);
