@@ -50,9 +50,8 @@ module.exports = {
     },
     changePassword : async (req, res) => {
         const body = req.body;
-        const user = req.user //req.user from middleware
+        const user = req.user
         try {
-            //get data from database
             const users = await User.findOne({
                 _id: user.id
             });
@@ -64,21 +63,14 @@ module.exports = {
                 });
             }
             const hash = hashPassword(newPassword);
-            //update to database
-            const update = await User.update({
-                password: hash,
-            }, {
-                where: {
-                    id: user.id
-                },
-            });
+            const update = await User.updateOne({_id : user.id}, {password: hash});
             if (update[0] != 1) {
                 return res.status(500).json({
                     status: "Internal Server Error",
                     message: "Update Password Failed"
                 })
             }
-            res.status(201).json({
+            res.status(200).json({
                 status: "OK",
                 message: "Change Password Success"
             })
