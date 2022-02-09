@@ -11,7 +11,7 @@ module.exports = {
       cloudinary: cloudinary,
       params: (req, file) => {
         return {
-          folder: fieldName + "/seeEvents",
+          folder: fieldName + "/whiteboard",
           resource_type: "raw",
           public_id: Date.now() + " - " + file.originalname,
         };
