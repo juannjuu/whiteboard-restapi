@@ -1,8 +1,9 @@
 const Card = require('../models/card')
 const User = require('../models/user')
+const errorHandler = require('../utils/error-handler')
 
 module.exports = {
-    async getAll(req, res) {
+    getAll : async (req, res) => {
         try {
             const indexCard = await Card.find({ 
                     listId: req.params.listId,
@@ -24,14 +25,11 @@ module.exports = {
                 result: indexCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async createCard(req, res) {
+    createCard : async (req, res) => {
         const body = req.body
         try {
             let listId = req.params.listId
@@ -46,14 +44,11 @@ module.exports = {
                 })
 
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async getDetail(req, res) {
+    getDetail : async (req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId
@@ -72,14 +67,11 @@ module.exports = {
                 result: getCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async updateCard(req, res) {
+     updateCard : async(req, res) => {
         const body = req.body
         const cardId = req.params.cardId
         try {
@@ -101,14 +93,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async postPriority(req, res) {
+     postPriority : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
@@ -129,14 +118,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async postLabel(req, res) {
+     postLabel : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
@@ -157,14 +143,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async getAssignTo(req, res) {
+     getAssignTo : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
@@ -183,14 +166,11 @@ module.exports = {
                 result: getCard.assignTo
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async postAssignTo(req, res) {
+     postAssignTo : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
@@ -220,14 +200,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async getUserTask(req, res) {
+     getUserTask : async(req, res) => {
         try {
             const findCard = await Card.find({
                 assignTo: {
@@ -249,14 +226,11 @@ module.exports = {
                 result: findCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error.message
-            })
+            errorHandler(res, error)
         }
     },
 
-    async postArchieved(req, res) {
+     postArchieved : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
@@ -277,14 +251,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async getArchieved(req, res) {
+     getArchieved : async(req, res) => {
         try {
             const indexCard = await Card.find({ 
                     listId: req.params.listId,
@@ -306,14 +277,11 @@ module.exports = {
                 result: indexCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async getComment(req, res) {
+     getComment : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
@@ -332,14 +300,11 @@ module.exports = {
                 result: getCard.comments
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async postComment(req, res) {
+     postComment : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const findUser = await User.findOne({
@@ -379,15 +344,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            console.log(error);
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async getChecklist(req, res) {
+     getChecklist : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
@@ -406,15 +367,11 @@ module.exports = {
                 result: getCard.checklist
             })
         } catch (error) {
-            console.log(error);
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 
-    async addChecklist(req, res) {
+     addChecklist : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
@@ -448,14 +405,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error.message
-            })
+            errorHandler(res, error)
         }
     },
 
-    async renameChecklist(req, res) {
+     renameChecklist : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 checklist: {
@@ -493,14 +447,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error.message
-            })
+            errorHandler(res, error)
         }
     },
 
-    async deleteChecklist(req, res) {
+     deleteChecklist : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 checklist: {
@@ -540,16 +491,13 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            console.log(error);
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error.message
-            })
+            errorHandler(res, error)
         }
     },
 
-    async isCheck(req, res) {
+     isCheck : async(req, res) => {
         try {
+            let checking = true
             const getCard = await Card.findOne({
                 checklist: {
                     $elemMatch: {
@@ -565,50 +513,10 @@ module.exports = {
                 })
             }
 
-            const updateCard = await Card.updateOne(
-                {
-                    checklist: {
-                        $elemMatch: {
-                            _id: req.params.checkId
-                        }
-                    }
-                }, 
-                {
-                    $set: {
-                        'checklist.$.isChecked': true
-                    }
+            for(x of getCard.checklist){
+                if(x._id == req.params.checkId && x.isChecked) {
+                        checking = false
                 }
-            )
-
-            res.status(201).send({
-                status: 201,
-                message: 'Data found!',
-                result: updateCard
-            })
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error.message
-            })
-        }
-    },
-
-    async isUnCheck(req, res) {
-        try {
-            const getCard = await Card.findOne({
-                checklist: {
-                    $elemMatch: {
-                        _id: req.params.checkId
-                    }
-                },
-            })
-
-            if(!getCard) {
-                res.status(400).json({
-                    message: 'Data not found',
-                    result: {}
-                })
             }
 
             const updateCard = await Card.updateOne(
@@ -618,10 +526,10 @@ module.exports = {
                             _id: req.params.checkId
                         }
                     }
-                }, 
+                },
                 {
                     $set: {
-                        'checklist.$.isChecked': false
+                        'checklist.$.isChecked': checking
                     }
                 }
             )
@@ -632,15 +540,11 @@ module.exports = {
                 result: updateCard
             })
         } catch (error) {
-            console.log(error);
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error.message
-            })
+            errorHandler(res, error)
         }
     },
 
-    async getAttachment(req, res) {
+     getAttachment : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
@@ -659,11 +563,7 @@ module.exports = {
                 result: getCard.attachment
             })
         } catch (error) {
-            console.log(error);
-            res.status(500).json({
-                message: 'Internal Server Error',
-                msgError: error
-            })
+            errorHandler(res, error)
         }
     },
 }
