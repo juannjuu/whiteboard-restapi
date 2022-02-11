@@ -1,16 +1,5 @@
 const {Schema, model} = require("mongoose")
 
-const userSchema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'users',
-    },
-    profileId: {
-        type: Schema.Types.ObjectId,
-        ref: 'profiles',
-    }
-})
-
 const schema = new Schema({
     teamName : {
         type: String,
