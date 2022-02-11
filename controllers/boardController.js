@@ -122,7 +122,7 @@ module.exports = {
         const {boardId} = req.params
         try {
             const members = await Board.find({_id: boardId}).select({"members" : 1})
-            if(!members){
+            if(members.length == 0){
                 return res.status(404).json({
                     status: "Not Found",
                     message: "No member found"
