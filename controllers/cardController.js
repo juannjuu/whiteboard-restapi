@@ -206,10 +206,11 @@ module.exports = {
 
      getUserTask : async(req, res) => {
         try {
+            let user = req.user
             const findCard = await Card.find({
                 assignTo: {
                     $elemMatch: {
-                        userId: req.params.userId
+                        userId: user.id
                     }
                 }
             })
@@ -307,8 +308,9 @@ module.exports = {
      postComment : async(req, res) => {
         const cardId = req.params.cardId
         try {
+            let user = req.user
             const findUser = await User.findOne({
-                _id: '6201c9c5f026540254bdf702'
+                _id: user.id
             })
 
             const getCard = await Card.findOne({
