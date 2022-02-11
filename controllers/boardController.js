@@ -1,5 +1,7 @@
 const Board = require("../models/board")
 const List = require("../models/list")
+const User = require("../models/user")
+const Profile = require("../models/profile")
 const Joi = require("joi");
 const errorHandler = require('../utils/error-handler')
 
@@ -27,8 +29,8 @@ module.exports = {
     getBoardDetail : async (req, res) => {
         const {boardId} = req.params
         try {
-            const lists = await List.findOne({boardId: boardId})
-            if(lists.length == 0) {
+            const lists = await List.find({boardId: boardId})
+            if(!lists) {
                 return res.status(404).json({
                     status: 'Not Found',
                     message: `No list created`,
@@ -77,6 +79,7 @@ module.exports = {
     createBoard : async (req, res) => {
         const {teamId} = req.params
         const body = req.body
+        const user = req.user
         try {
             const schema = Joi.object({
                 title : Joi.string().required()
@@ -88,7 +91,18 @@ module.exports = {
                   message: error.message,
                 });
             }
-            const board = await Board.create({teamId: teamId, title: body.title})
+            const creatorProfile = await Profile.findOne({userId: user.id})
+            if(!creatorProfile){
+                return res.status(404).json({
+                    status: "Not Found",
+                    message: "Profile not found",
+                })
+            }
+            const member = {
+                userId: user.id,
+                profileId: creatorProfile._id
+            }
+            const board = await Board.create({teamId: teamId, title: body.title, members: member})
             if(!board){
                 return res.status(500).json({
                     status: "Internal Server Error",
@@ -105,6 +119,25 @@ module.exports = {
         }
     },
     getBoardMembers : async (req, res) => {
-        
+        const {boardId} = req.params
+        try {
+            const members = await Board.find({_id: boardId}).select({"members" : 1})
+            if(!members){
+                return res.status(404).json({
+                    status: "Not Found",
+                    message: "No member found"
+                })
+            }
+            res.status(200).json({
+                status: "OK",
+                message: "Board members found",
+                result: members
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+    archiveList : async (req, res) => {
+
     }
 }

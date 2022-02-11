@@ -7,6 +7,6 @@ router.get("/:teamId", isLogin, getBoards)
 router.get("/board/:boardId", isLogin, getBoardDetail)
 router.post("/:boardId/list", isLogin, createList)
 router.post("/:teamId", isLogin, createBoard)
-router.get("/:boardId/:userId", isLogin, getBoardMembers)
+router.get("/members/:boardId", isLogin, getBoardMembers)
 
 module.exports = router
