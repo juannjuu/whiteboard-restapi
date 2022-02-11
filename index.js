@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const router = require("./routes/auth-route");
+const router = require("./routes/index");
 const port = 5000;
 const connect = require("./config/db");
 const passport = require("./config/passport");
@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
     });
 });
 
-app.get("/api/v1/auth/google");
+app.use("/api/v1", router);
 app.get(
     "/api/v1/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/api/v1/auth/google" }),

@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
-const { Users, PasswordReset } = require("../models/user");
+const Users = require("../models/user");
 const bcrypt = require("bcrypt");
 const catchHandler = require("../utils/catch-handler");
 // const random = require("randomstring");
@@ -10,6 +10,7 @@ module.exports = {
     register: async(req, res) => {
         const body = req.body;
         try {
+            console.log(req.body);
             const schema = Joi.object({
                 email: Joi.string().email().required(),
                 name: Joi.string().required(),
@@ -24,9 +25,7 @@ module.exports = {
                 });
             }
             const check = await Users.findOne({
-                where: {
-                    email: body.email,
-                },
+                email: body.email,
             });
             if (check) {
                 return res.status(400).json({
@@ -43,10 +42,10 @@ module.exports = {
             });
 
             const token = jwt.sign({
-                    id: user.id,
+                    id: user._id,
                     email: user.email,
                 },
-                process.env.SECRET_TOKEN, { expiresIn: 60 * 60 * 12 }
+                process.env.JWT_SECRET, { expiresIn: 60 * 60 * 12 }
             );
 
             res.status(200).json({
@@ -75,7 +74,9 @@ module.exports = {
                     result: {},
                 });
             }
-            const user = await Users.findOne({ where: { email } });
+            const user = await Users.findOne({
+                email: email,
+            });
             if (!user) {
                 return res.status(401).json({
                     status: "Unauthorized",
@@ -92,7 +93,7 @@ module.exports = {
                 });
             }
             const token = jwt.sign({ email: user.email, id: user.id },
-                process.env.SECRET_TOKEN, {
+                process.env.JWT_SECRET, {
                     expiresIn: "12h",
                 }
             );
@@ -260,7 +261,7 @@ module.exports = {
                 });
             }
             const token = jwt.sign({ email: user.email, id: user._id },
-                process.env.SECRET_TOKEN
+                process.env.JWT_SECRET
             );
             res.cookie("token", token);
             res.redirect("/");
@@ -269,25 +270,25 @@ module.exports = {
             res.status(500).send("Internal Server Error");
         }
     },
-    facebookCallback: async(req, res) => {
-        const profile = req.user._json;
-        let user;
-        try {
-            user = await Users.findOne({ email: profile.email });
-            if (!user) {
-                user = await Users.create({
-                    email: profile.email,
-                    name: profile.name,
-                    password: "",
-                });
-            }
-            const token = jwt.sign({ email: user.email, id: user._id },
-                process.env.SECRET_TOKEN
-            );
-            res.cookie("token", token);
-            res.redirect("/");
-        } catch (error) {
-            res.status(500).send("Internal Server Error");
-        }
-    },
+    // facebookCallback: async(req, res) => {
+    //     const profile = req.user._json;
+    //     let user;
+    //     try {
+    //         user = await Users.findOne({ email: profile.email });
+    //         if (!user) {
+    //             user = await Users.create({
+    //                 email: profile.email,
+    //                 name: profile.name,
+    //                 password: "",
+    //             });
+    //         }
+    //         const token = jwt.sign({ email: user.email, id: user._id },
+    //             process.env.JWT_SECRET
+    //         );
+    //         res.cookie("token", token);
+    //         res.redirect("/");
+    //     } catch (error) {
+    //         res.status(500).send("Internal Server Error");
+    //     }
+    // },
 };

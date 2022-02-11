@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("./auth-route");
+const authRoute = require("./auth-route");
 const {
     register,
     login,
     forgotPassword,
     resetPassword,
 } = require("../controllers/auth-controller");
-const {
-    createProfile,
-    getProfile,
-} = require("../controllers/profile-controller");
+// const {
+//     createProfile,
+//     getProfile,
+// } = require("../controllers/profile-controller");
 const { isLogin } = require("../middleware/auth");
 const passport = require("../config/passport");
 const {
