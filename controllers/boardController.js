@@ -138,6 +138,47 @@ module.exports = {
         }
     },
     archiveList : async (req, res) => {
-
-    }
+        const {listId} = req.params
+        let archive
+        try {
+            const list = await List.findOne({_id: listId})
+            if(!list){
+                return res.status(404).json({
+                    status: "Not Found",
+                    message: "No list found"
+                })
+            }
+            if(!list.isArchieved) {
+                archive = await List.findOneAndUpdate({_id: list}, {isArchieved : true}, {new: true})
+                if(!archive){
+                    return res.status(500).json({
+                        status: "Internal Server Error",
+                        message: "Archive List Failed"
+                    })
+                }
+                return res.status(200).json({
+                    status: "OK",
+                    message: "Archive Success",
+                    result: archive
+                })
+            }else {
+                archive = await List.findOneAndUpdate({_id: list}, {isArchieved : false}, {new: true})
+                if(!archive){
+                    return res.status(500).json({
+                        status: "Internal Server Error",
+                        message: "Unarchive List Failed"
+                    })
+                }
+                return res.status(200).json({
+                    status: "OK",
+                    message: "Unarchive Success",
+                    result: archive
+                })
+            }
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+    inviteMembers : async (req, res) => {},
+    copyList : async (req, res) => {}
 }
