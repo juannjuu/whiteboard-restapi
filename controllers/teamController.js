@@ -1,12 +1,13 @@
 const Team = require('../models/team')
 const errorHandler = require('../utils/error-handler')
 const Profile = require('../models/profile')
+const Board = require('../models/board')
 
 module.exports = {
     getTeam : async(req, res) => {
         try {
             // let userId = req.user
-            const findTeam = await Team.find({
+            const findTeam = await Board.find({
                 members: {
                     $elemMatch: {
                         userId: req.params.userId
@@ -27,19 +28,10 @@ module.exports = {
 
     createTeam : async(req, res) => {
         try {
-            // let user = req.user
             let body = req.body
-            const findProfile = await Profile.findOne({
-                userId: req.params.userId
-            })
+            
             let teamNew = new Team(body)
 
-            let member = {
-                userId: req.params.userId,
-                profileId: findProfile._id
-            }
-
-            teamNew.members.push(member)
             await teamNew.save(teamNew)
 
             res.status(201).send({
