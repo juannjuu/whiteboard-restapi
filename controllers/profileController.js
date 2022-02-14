@@ -56,7 +56,7 @@ module.exports = {
         }
     },
     changePassword : async (req, res) => {
-        const {oldPassword, newPassword} = req.body;
+        const {oldPassword, newPassword} = req.body
         const user = req.user
         try {
             const users = await User.findOne({
