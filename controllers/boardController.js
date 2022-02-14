@@ -30,7 +30,7 @@ module.exports = {
         const {boardId} = req.params
         try {
             const lists = await List.find({boardId: boardId})
-            if(!lists) {
+            if(lists.length == 0) {
                 return res.status(404).json({
                     status: 'Not Found',
                     message: `No list created`,
