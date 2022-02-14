@@ -34,7 +34,7 @@ module.exports = {
                 })
             }
             req.user = {
-                id: user.id,
+                id: user._id,
                 email: user.email,
             }
             next()
