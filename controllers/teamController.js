@@ -6,18 +6,15 @@ const Board = require('../models/board')
 module.exports = {
     getTeam : async(req, res) => {
         try {
-            // let userId = req.user
             const findTeam = await Board.find({
                 members: {
                     $elemMatch: {
                         userId: req.params.userId
-                        // userId: userId.id
                     }
                 }
             })
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Team Index',
                 result: findTeam
             })
@@ -25,39 +22,31 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
     createTeam : async(req, res) => {
         try {
             let body = req.body
-            
             let teamNew = new Team(body)
-
             await teamNew.save(teamNew)
-
             res.status(201).send({
-                status: 201,
+                status: "Created",
                 message: 'Created Successfully',
                 result: teamNew
             })
-
         } catch (error) {
             errorHandler(res, error)
         }
     },
-
     getDetailTeam: async(req, res) => {
         try {
             let findTeam = await Team.findById(req.params.teamId)
-
             if (!findTeam) {
                 res.status(400).send({
-                    status: 400,
+                    status: "Not Found",
                     message: 'Data not found!'
                 })
             }
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: findTeam
             })
