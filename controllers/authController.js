@@ -3,7 +3,7 @@ const Users = require("../models/user");
 const Profile = require("../models/profile")
 const PasswordReset = require("../models/passwordreset");
 const bcrypt = require("bcrypt");
-const catchHandler = require("../utils/catch-handler");
+const errorHandler = require("../utils/error-handler");
 const random = require("randomstring");
 const sendMail = require("../utils/mail-sender");
 
@@ -42,7 +42,7 @@ module.exports = {
                 profile : profile
             });
         } catch (error) {
-            catchHandler(res, error);
+            errorHandler(res, error);
         }
     },
     login: async(req, res) => {
@@ -80,7 +80,7 @@ module.exports = {
                 },
             });
         } catch (error) {
-            catchHandler(res, error);
+            errorHandler(res, error);
         }
     },
     forgotPassword: async(req, res) => {
@@ -177,7 +177,7 @@ module.exports = {
                 result: {},
             });
         } catch (error) {
-            catchHandler(res, error);
+            errorHandler(res, error);
         }
     },
     resetPassword: async(req, res) => {
@@ -219,7 +219,7 @@ module.exports = {
                 result: {},
             });
         } catch (error) {
-            catchHandler(res, error);
+            errorHandler(res, error);
         }
     },
     googleCallback: async(req, res) => {
