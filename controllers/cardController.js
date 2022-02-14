@@ -11,16 +11,15 @@ module.exports = {
                         $ne: true
                     }
             })
-
             if(!indexCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Card is empty',
                     result: {}
                 })
             }
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: indexCard
             })
@@ -28,16 +27,15 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
     createCard : async (req, res) => {
         const body = req.body
         try {
             let listId = req.params.listId
             const cardNew = new Card({listId, ...body})
-
             await cardNew.save(cardNew)
                 .then((cardNew) => {
                     res.status(201).send({
+                        status: 'Created',
                         message: 'Created Succesfully',
                         result: cardNew
                     })
@@ -47,22 +45,20 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
     getDetail : async (req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: getCard
             })
@@ -70,25 +66,23 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     updateCard : async(req, res) => {
+    updateCard : async(req, res) => {
         const body = req.body
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
                 _id: cardId
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             const updateCard = await Card.updateOne({_id: cardId}, body)
-
             res.status(201).send({
+                status: 'Created',
                 message: 'Update Succesfully',
                 result: updateCard
             })
@@ -96,24 +90,22 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     postPriority : async(req, res) => {
+    postPriority : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
                 _id: cardId
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             const updateCard = await Card.updateOne({_id: cardId}, {priority: req.body.priority})
-
             res.status(201).send({
+                status: 'Created',
                 message: 'Update Succesfully',
                 result: updateCard
             })
@@ -121,24 +113,22 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     postLabel : async(req, res) => {
+    postLabel : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
                 _id: cardId
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             const updateCard = await Card.updateOne({_id: cardId}, {labels: req.body.labels})
-
             res.status(201).send({
+                status: 'Created',
                 message: 'Update Succesfully',
                 result: updateCard
             })
@@ -146,22 +136,20 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     getAssignTo : async(req, res) => {
+    getAssignTo : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: getCard.assignTo
             })
@@ -169,21 +157,19 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     postAssignTo : async(req, res) => {
+    postAssignTo : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
                 _id: cardId
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             const updateCard = await Card.updateOne(
                 {
                     _id: cardId
@@ -194,8 +180,8 @@ module.exports = {
                     }
                 }
             )
-
-            res.status(201).send({
+            res.status(200).send({
+                status: 'Not Found',
                 message: 'Update Succesfully',
                 result: updateCard
             })
@@ -203,8 +189,7 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     getUserTask : async(req, res) => {
+    getUserTask : async(req, res) => {
         try {
             let user = req.user
             const findCard = await Card.find({
@@ -214,15 +199,15 @@ module.exports = {
                     }
                 }
             })
-
             if (!findCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'There is no card!',
                     result: {}
                 })
             }
-
             res.status(200).send({
+                status: 'OK',
                 message: 'Task Found!',
                 result: findCard
             })
@@ -230,24 +215,22 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     postArchieved : async(req, res) => {
+    postArchieved : async(req, res) => {
         const cardId = req.params.cardId
         try {
             const getCard = await Card.findOne({
                 _id: cardId
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             const updateCard = await Card.updateOne({_id: cardId}, {isArchieved: true})
-
             res.status(201).send({
+                status: 'Created',
                 message: 'Archieved Succesfully',
                 result: updateCard
             })
@@ -255,8 +238,7 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     getArchieved : async(req, res) => {
+    getArchieved : async(req, res) => {
         try {
             const indexCard = await Card.find({ 
                     listId: req.params.listId,
@@ -264,16 +246,15 @@ module.exports = {
                         $eq: true
                     }
             })
-
             if(!indexCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Card is empty',
                     result: {}
                 })
             }
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: indexCard
             })
@@ -281,22 +262,20 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     getComment : async(req, res) => {
+    getComment : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: getCard.comments
             })
@@ -304,32 +283,28 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     postComment : async(req, res) => {
+    postComment : async(req, res) => {
         const cardId = req.params.cardId
         try {
             let user = req.user
             const findUser = await User.findOne({
                 _id: user.id
             })
-
             const getCard = await Card.findOne({
                 _id: cardId
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             let comments = {
                 userId: findUser._id,
                 name: findUser.name,
                 comment: req.body.comment
             }
-
             const updateCard = await Card.updateOne(
                 {
                     _id: cardId
@@ -340,8 +315,8 @@ module.exports = {
                     }
                 }
             )
-
             res.status(201).send({
+                status: 'Created',
                 message: 'Update Succesfully',
                 result: updateCard
             })
@@ -349,22 +324,19 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     getChecklist : async(req, res) => {
+    getChecklist : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
             })
-
             if(!getCard) {
                 res.status(400).json({
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             res.status(201).send({
-                status: 201,
+                status: "Created",
                 message: 'Data found!',
                 result: getCard.checklist
             })
@@ -372,24 +344,21 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     addChecklist : async(req, res) => {
+    addChecklist : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             let check = {
                 name: req.body.name
             }
-
             const updateCard = await Card.updateOne(
                 {
                     _id: req.params.cardId
@@ -400,9 +369,8 @@ module.exports = {
                     }
                 }
             )
-
             res.status(201).send({
-                status: 201,
+                status: "Created",
                 message: 'Data found!',
                 result: updateCard
             })
@@ -410,8 +378,7 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     renameChecklist : async(req, res) => {
+    renameChecklist : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 checklist: {
@@ -420,14 +387,13 @@ module.exports = {
                     }
                 },
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             const updateCard = await Card.updateOne(
                 {
                     checklist: {
@@ -442,9 +408,8 @@ module.exports = {
                     }
                 }
             )
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: updateCard
             })
@@ -452,8 +417,7 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     deleteChecklist : async(req, res) => {
+    deleteChecklist : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 checklist: {
@@ -462,14 +426,12 @@ module.exports = {
                     }
                 },
             })
-
             if(!getCard) {
                 res.status(400).json({
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             const updateCard = await Card.updateOne(
                 {
                     checklist: {
@@ -486,9 +448,8 @@ module.exports = {
                     }
                 }
             )
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: updateCard
             })
@@ -496,8 +457,7 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     isCheck : async(req, res) => {
+    isCheck : async(req, res) => {
         try {
             let checking = true
             const getCard = await Card.findOne({
@@ -507,20 +467,18 @@ module.exports = {
                     }
                 },
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
             for(x of getCard.checklist){
                 if(x._id == req.params.checkId && x.isChecked) {
                         checking = false
                 }
             }
-
             const updateCard = await Card.updateOne(
                 {
                     checklist: {
@@ -535,9 +493,8 @@ module.exports = {
                     }
                 }
             )
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: updateCard
             })
@@ -545,22 +502,20 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-
-     getAttachment : async(req, res) => {
+    getAttachment : async(req, res) => {
         try {
             const getCard = await Card.findOne({
                 _id: req.params.cardId,
             })
-
             if(!getCard) {
                 res.status(400).json({
+                    status: 'Not Found',
                     message: 'Data not found',
                     result: {}
                 })
             }
-
-            res.status(201).send({
-                status: 201,
+            res.status(200).send({
+                status: "OK",
                 message: 'Data found!',
                 result: getCard.attachment
             })
