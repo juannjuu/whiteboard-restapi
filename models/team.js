@@ -5,7 +5,6 @@ const schema = new Schema({
         type: String,
         required: true
     },
-    members : [userSchema],
     createdAt : {
         type: Date,
         default : Date.now()
