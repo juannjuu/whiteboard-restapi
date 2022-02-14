@@ -6,16 +6,10 @@ const Board = require('../models/board')
 module.exports = {
     getTeam : async(req, res) => {
         try {
-            const findTeam = await Board.find({
-                members: {
-                    $elemMatch: {
-                        userId: req.params.userId
-                    }
-                }
-            })
+            const findTeam = await Team.find()
             res.status(200).send({
                 status: "OK",
-                message: 'Team Index',
+                message: 'Team is found',
                 result: findTeam
             })
         } catch (error) {
