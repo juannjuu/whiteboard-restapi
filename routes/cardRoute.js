@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const CardController = require('../controllers/cardController')
 const {isLogin} = require('../middlewares/auth')
+const { uploadAttach } = require('../middlewares/cloudUpload')
 
 router.get('/:listId/card', isLogin, CardController.getAll)
 router.post('/:listId/card', isLogin, CardController.createCard)
@@ -15,6 +16,7 @@ router.post('/:checkId/rename', isLogin, CardController.renameChecklist)
 router.post('/:checkId/delete', isLogin, CardController.deleteChecklist)
 router.post('/:checkId/check', isLogin, CardController.isCheck)
 router.get('/:cardId/attachment', isLogin, CardController.getAttachment)
+router.post('/attachment', uploadAttach, CardController.postAttachment)
 router.post('/:cardId/priority', isLogin, CardController.postPriority)
 router.post('/:cardId/label', isLogin, CardController.postLabel)
 router.get('/:cardId/assign', isLogin, CardController.getAssignTo)

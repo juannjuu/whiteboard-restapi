@@ -48,4 +48,43 @@ module.exports = {
       });
     };
   },
+
+  uploadAttach: (fieldName) => {
+    const storage = new CloudinaryStorage({
+      cloudinary,
+      params: (req, file) => {
+        return {
+          folder: fieldName + '/attachment',
+          resource_type: 'raw',
+          public_id: Date.now() + ' - ' + file.originalname
+        }
+      }
+    })
+
+    const fileFilter = (req, file, cb) => {
+      cb(null, true);
+    };
+
+    const upload = multer({
+      storage,
+      fileFilter,
+      limits: {
+        fileSize: 1024 * 1024 * 2
+      }
+    }).single(
+      fieldName
+    )
+
+    return(req, res, next) => {
+      upload(req, res, (err) => {
+        if (err) {
+          return req.status(400).json({
+            status: 'Bad Request',
+            message: err.message
+          })
+        }
+        next()
+      })
+    }
+  }
 };

@@ -568,4 +568,12 @@ module.exports = {
             errorHandler(res, error)
         }
     },
+
+    postAttachment : async(req, res) => {
+        try {
+            console.log(req.file)
+        } catch (error) {
+            throw error
+        }
+    }
 }
