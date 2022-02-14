@@ -14,7 +14,7 @@ module.exports = {
                 });
             }
             token = token.replace("Bearer ", "");
-            const decoded = jwt.verify(token, process.env.SECRET_TOKEN);
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const user = await Users.findByPk(decoded.id);
             if (!user) {
                 return res.status(401).json({
@@ -47,7 +47,7 @@ module.exports = {
                 });
             }
             token = token.replace("Bearer ", "");
-            const decoded = jwt.verify(token, process.env.SECRET_TOKEN);
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const user = await Users.findByPk(decoded.id);
             if (!user) {
                 return res.status(401).json({

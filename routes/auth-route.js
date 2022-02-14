@@ -7,15 +7,15 @@ const {
     forgotPassword,
     resetPassword,
 } = require("../controllers/auth-controller");
-// const {
-//     createProfile,
-//     getProfile,
-// } = require("../controllers/profile-controller");
+const {
+    createProfile,
+    getProfile,
+} = require("../controllers/profile-controller");
 const { isLogin } = require("../middleware/auth");
 const passport = require("../config/passport");
 const {
     googleCallback,
-    // facebookCallback,
+    facebookCallback,
 } = require("../controllers/auth-controller");
 
 router.get(
@@ -28,22 +28,22 @@ router.get(
     googleCallback
 );
 
-// router.get(
-//     "/facebook",
-//     passport.authenticate("facebook", { scope: ["email"] })
-// );
-// router.get(
-//     "/facebook/callback",
-//     passport.authenticate("facebook", {
-//         failureRedirect: "/api/v1/auth/facebook",
-//     }),
-//     facebookCallback
-// );
+router.get(
+    "/facebook",
+    passport.authenticate("facebook", { scope: ["email"] })
+);
+router.get(
+    "/facebook/callback",
+    passport.authenticate("facebook", {
+        failureRedirect: "/api/v1/auth/facebook",
+    }),
+    facebookCallback
+);
 
 router.post("/register", register);
 router.post("/login", login);
-// router.post("/profile", isLogin, createProfile);
-// router.get("/profile", isLogin, getProfile);
+router.post("/profile", isLogin, createProfile);
+router.get("/profile", isLogin, getProfile);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 

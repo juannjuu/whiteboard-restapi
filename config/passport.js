@@ -3,20 +3,20 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const passport = require("passport");
 const User = require("../models/user");
 const findOrCreate = require("mongoose-find-or-create");
-// passport.use(
-//     new FacebookStrategy({
-//             clientID: "",
-//             clientSecret: "",
-//             callbackURL: "",
-//         },
-//         function(accessToken, refreshToken, profile, cb) {
-//             cb(null, profile);
-//             User.findOrCreate({ facebookId: profile.id }, function(err, user) {
-//                 return cb(err, user);
-//             });
-//         }
-//     )
-// );
+passport.use(
+    new FacebookStrategy({
+            clientID: "458810855968059",
+            clientSecret: "02975fb7c0778a62bc7fb8f19f715d80",
+            callbackURL: "http://localhost:5000api/v1/auth/facebook/callback",
+        },
+        function(accessToken, refreshToken, profile, cb) {
+            cb(null, profile);
+            User.findOrCreate({ facebookId: profile.id }, function(err, user) {
+                return cb(err, user);
+            });
+        }
+    )
+);
 
 passport.use(
     "google",
@@ -27,10 +27,10 @@ passport.use(
         },
         async function(accessToken, refreshToken, profile, cb) {
             const findUser = await User.findOne({
-                email: profile.emails[0].value
-            })
+                email: profile.emails[0].value,
+            });
 
-            console.log(findUser)
+            console.log(findUser);
         }
     )
 );

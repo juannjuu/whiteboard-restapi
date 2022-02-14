@@ -1,9 +1,10 @@
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const Users = require("../models/user");
+const PasswordReset = require("../models/passwordreset");
 const bcrypt = require("bcrypt");
 const catchHandler = require("../utils/catch-handler");
-// const random = require("randomstring");
+const random = require("randomstring");
 const sendMail = require("../utils/mail-sender");
 
 module.exports = {
@@ -112,7 +113,7 @@ module.exports = {
     forgotPassword: async(req, res) => {
         const { email } = req.body;
         try {
-            const user = await Users.findOne({ where: { email } });
+            const user = await Users.findOne({ email: email });
             if (!user) {
                 return res.status(404).json({
                     status: "Not Found",
@@ -194,8 +195,7 @@ module.exports = {
         </tr>
     </table>
     <!--/100% body table-->
-</body>
-      `
+</body>   `
             );
 
             res.status(200).json({
@@ -223,7 +223,8 @@ module.exports = {
                 });
             }
             const validate = await PasswordReset.findOne({
-                where: { validationCode, isDone: false },
+                validationCode,
+                isDone: false,
             });
             if (!validate) {
                 return res.status(404).json({
@@ -235,9 +236,9 @@ module.exports = {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            await Users.update({ password: hashedPassword }, { where: { email: validate.email } });
+            await Users.updateOne({ email: validate.email }, { password: hashedPassword });
 
-            await PasswordReset.update({ isDone: true }, { where: { validationCode } });
+            await PasswordReset.updateOne({ isDone: true }, { validationCode: validationCode });
 
             res.status(200).json({
                 status: "success",
@@ -270,25 +271,25 @@ module.exports = {
             res.status(500).send("Internal Server Error");
         }
     },
-    // facebookCallback: async(req, res) => {
-    //     const profile = req.user._json;
-    //     let user;
-    //     try {
-    //         user = await Users.findOne({ email: profile.email });
-    //         if (!user) {
-    //             user = await Users.create({
-    //                 email: profile.email,
-    //                 name: profile.name,
-    //                 password: "",
-    //             });
-    //         }
-    //         const token = jwt.sign({ email: user.email, id: user._id },
-    //             process.env.JWT_SECRET
-    //         );
-    //         res.cookie("token", token);
-    //         res.redirect("/");
-    //     } catch (error) {
-    //         res.status(500).send("Internal Server Error");
-    //     }
-    // },
+    facebookCallback: async(req, res) => {
+        const profile = req.user._json;
+        let user;
+        try {
+            user = await Users.findOne({ email: profile.email });
+            if (!user) {
+                user = await Users.create({
+                    email: profile.email,
+                    name: profile.name,
+                    password: "",
+                });
+            }
+            const token = jwt.sign({ email: user.email, id: user._id },
+                process.env.JWT_SECRET
+            );
+            res.cookie("token", token);
+            res.redirect("/");
+        } catch (error) {
+            res.status(500).send("Internal Server Error");
+        }
+    },
 };
