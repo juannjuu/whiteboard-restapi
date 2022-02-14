@@ -5,36 +5,6 @@ const {hashPassword, comparePassword} = require("../utils/bcrypt")
 const {generateToken} = require("../utils/jwt")
 
 module.exports = {
-    register : async (req, res) => {
-        const body = req.body
-        try {
-            const checkExist = await User.findOne({
-                email : body.email
-            });
-            if(checkExist) {
-                return res.status(400).json({
-                    status: "Bad Request",
-                    message: "Email is Already Exist",
-                });
-            }
-            const hashedPassword = await hashPassword(body.password)
-            const user = await User.create({...body, password: hashedPassword})
-            const profile = await Profile.create({userId : user._id})
-            const token = generateToken({
-                id: user._id,
-                email: user.email,
-            });
-            res.status(201).json({
-                status: "OK",
-                message: "Created",
-                result: user,
-                token: token,
-                profile: profile
-            })
-        } catch (error) {
-            errorHandler(res, error)
-        }
-    },
     editProfile : async (req, res) => {
         const body = req.body
         const user = req.user
