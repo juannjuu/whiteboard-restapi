@@ -3,7 +3,7 @@ const router = express.Router();
 const { register, login, forgotPassword, resetPassword} = require("../controllers/authController");
 const passport = require("../config/passport");
 const { googleCallback, facebookCallback} = require("../controllers/authController");
-const {registerValidation, loginValidation} = require("../middlewares/authValidation")
+// const {registerValidation, loginValidation} = require("../middlewares/authValidation")
 
 router.get(
     "/google",
@@ -27,8 +27,8 @@ router.get(
     facebookCallback
 );
 
-router.post("/register", registerValidation, register);
-router.post("/login", loginValidation, login);
+router.post("/register", register);
+router.post("/login", login);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 
