@@ -11,7 +11,7 @@ module.exports = {
       cloudinary: cloudinary,
       params: (req, file) => {
         return {
-          folder: fieldName + "/seeEvents",
+          folder: fieldName + "/whiteboard",
           resource_type: "raw",
           public_id: Date.now() + " - " + file.originalname,
         };
@@ -51,40 +51,45 @@ module.exports = {
 
   uploadAttach: (fieldName) => {
     const storage = new CloudinaryStorage({
-      cloudinary,
+      cloudinary: cloudinary,
       params: (req, file) => {
         return {
-          folder: fieldName + '/attachment',
-          resource_type: 'raw',
-          public_id: Date.now() + ' - ' + file.originalname
-        }
-      }
-    })
+          folder: fieldName,
+          resource_type: "raw",
+          public_id: Date.now() + "-" + file.originalname,
+        };
+      },
+    });
 
     const fileFilter = (req, file, cb) => {
+      if (!file) {
+        return cb(new Error("Please select files"), false);
+      }
       cb(null, true);
     };
 
-    const upload = multer({
-      storage,
-      fileFilter,
-      limits: {
-        fileSize: 1024 * 1024 * 2
-      }
-    }).single(
+    const upload = multer({ storage, fileFilter, limits: { fileSize: 1024 * 1024 * 2 } }).single(
       fieldName
-    )
+    ); 
 
-    return(req, res, next) => {
+    return (req, res, next) => {
       upload(req, res, (err) => {
         if (err) {
-          return req.status(400).json({
-            status: 'Bad Request',
-            message: err.message
-          })
+          if ((err.code = "LIMIT_FILE_SIZE")) {
+            return res.status(400).json({
+              status: "Bad Request",
+              message: "Exceed maxium file size (2mb)",
+              result: {},
+            });
+          }
+          return res.status(400).json({
+            status: "Bad Request",
+            message: err.message,
+            result: {},
+          });
         }
-        next()
-      })
+        next();
+      });
     }
   }
 };

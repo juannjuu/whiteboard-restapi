@@ -35,6 +35,15 @@ const checklistSchema = new Schema({
     }
 })
 
+const attachmentSchema = new Schema({
+    fileName : {
+        type: String
+    },
+    linkFile: {
+        type: String
+    }
+})
+
 const schema = new Schema({
     listId: {
         type: Schema.Types.ObjectId,
@@ -64,7 +73,7 @@ const schema = new Schema({
         type: [commentSchema]
     },
     attachment: {
-        type: Array
+        type: [attachmentSchema]
     },
     checklist: {
         type: [checklistSchema]

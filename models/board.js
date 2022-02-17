@@ -1,5 +1,16 @@
 const { Schema, model } = require("mongoose")
 
+const userSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'users',
+    },
+    profileId: {
+        type: Schema.Types.ObjectId,
+        ref: 'profiles',
+    }
+})
+
 const schema = new Schema({
     teamId : { 
         type: Schema.Types.ObjectId,
@@ -10,6 +21,7 @@ const schema = new Schema({
         type: String,
         required: true
     },
+    members : [userSchema],
     label : {
         type: Array,
         default: ["UI/UX", "Development", "Design"]
