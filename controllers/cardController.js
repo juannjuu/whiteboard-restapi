@@ -410,7 +410,7 @@ module.exports = {
             )
             res.status(200).send({
                 status: "OK",
-                message: 'Data found!',
+                message: 'Renamed Successfully!',
                 result: updateCard
             })
         } catch (error) {
@@ -450,7 +450,7 @@ module.exports = {
             )
             res.status(200).send({
                 status: "OK",
-                message: 'Data found!',
+                message: 'Deleted Successfully!',
                 result: updateCard
             })
         } catch (error) {
@@ -495,7 +495,7 @@ module.exports = {
             )
             res.status(200).send({
                 status: "OK",
-                message: 'Data found!',
+                message: 'Checked!',
                 result: updateCard
             })
         } catch (error) {
@@ -525,40 +525,123 @@ module.exports = {
     },
 
     postAttachment : async(req, res) => {
-        const fileName = req.file.originalname.split('.')
         try {
             // console.log(req.file.path)
             const getCard = await Card.findOne({
                 _id: req.params.cardId
             })
-
+            
             if(!getCard) {
                 res.status(400).json({
                     message: 'Data not found',
                     result: {}
                 })
             }
+            
+            for(let i = 0; i < req.files.length; i++) {
+                let fileName = req.files[i].originalname.split('.')
 
-            let attachment = {
-                fileName: fileName[0],
-                linkFile: req.file.path
+                let attachment = {
+                    fileName: fileName[0],
+                    linkFile: req.files[i].path
+                }
+
+                const updateCard = await Card.updateOne(
+                    { _id: req.params.cardId }, 
+                    {
+                        $push: {
+                            attachment: attachment
+                        }
+                    }
+                )
             }
 
+            res.status(201).send({
+                message: 'Add attachment Succesfully',
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+
+    renameAttachment : async(req, res) => {
+        try {
+            const getCard = await Card.findOne({
+                attachment: {
+                    $elemMatch: {
+                        _id: req.params.attachmentId
+                    }
+                },
+            })
+            if(!getCard) {
+                res.status(400).json({
+                    status: 'Not Found',
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
             const updateCard = await Card.updateOne(
-                { _id: req.params.cardId }, 
                 {
-                    $push: {
-                        attachment: attachment
+                    attachment: {
+                        $elemMatch: {
+                            _id: req.params.attachmentId
+                        }
+                    }
+                }, 
+                {
+                    $set: {
+                        'attachment.$.fileName': req.body.fileName
                     }
                 }
             )
-
-            res.status(201).send({
-                message: 'Update Succesfully',
+            res.status(200).send({
+                status: "OK",
+                message: 'Renamed Successfully!',
                 result: updateCard
             })
         } catch (error) {
             errorHandler(res, error)
         }
-    }
+    },
+
+    deleteAttachment : async(req, res) => {
+        try {
+            const getCard = await Card.findOne({
+                attachment: {
+                    $elemMatch: {
+                        _id: req.params.attachmentId
+                    }
+                },
+            })
+            if(!getCard) {
+                res.status(400).json({
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+            const updateCard = await Card.updateOne(
+                {
+                    attachment: {
+                        $elemMatch: {
+                            _id: req.params.attachmentId
+                        }
+                    }
+                }, 
+                {
+                    $pull: {
+                        'attachment': {
+                            _id: req.params.attachmentId
+                        } 
+                    }
+                }
+            )
+            res.status(200).send({
+                status: "OK",
+                message: 'Delete Success!',
+                result: updateCard
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
 }

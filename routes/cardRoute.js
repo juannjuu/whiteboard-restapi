@@ -19,7 +19,9 @@ router.post('/:checkId/delete', isLogin, CardController.deleteChecklist)
 router.post('/:checkId/check', isLogin, CardController.isCheck)
 
 router.get('/:cardId/attachment', isLogin, CardController.getAttachment)
-router.post('/:cardId/attachment', uploadAttach("attachment"), CardController.postAttachment)
+router.post('/:cardId/attachment', isLogin, uploadAttach("attachment"), CardController.postAttachment)
+router.post('/attachment/:attachmentId', isLogin, CardController.renameAttachment)
+router.delete('/attachment/:attachmentId', isLogin, CardController.deleteAttachment)
 
 router.post('/:cardId/priority', isLogin, CardController.postPriority)
 router.post('/:cardId/label', isLogin, CardController.postLabel)

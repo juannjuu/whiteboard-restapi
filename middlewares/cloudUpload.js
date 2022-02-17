@@ -68,7 +68,7 @@ module.exports = {
       cb(null, true);
     };
 
-    const upload = multer({ storage, fileFilter, limits: { fileSize: 1024 * 1024 * 2 } }).single(
+    const upload = multer({ storage, fileFilter, limits: { fileSize: 1024 * 1024 * 2 } }).any(
       fieldName
     ); 
 
