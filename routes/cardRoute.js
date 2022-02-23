@@ -8,6 +8,8 @@ router.get('/:listId/card', isLogin, CardController.getAll)
 router.post('/:listId/card', isLogin, CardController.createCard)
 router.get('/detail/:cardId', isLogin, CardController.getDetail)
 router.put('/detail/:cardId', isLogin, CardController.updateCard)
+router.post('/:listId/:listDest', isLogin, CardController.copyAllCard)
+router.post('/:cardId/:listDest/one', isLogin, CardController.copyOneCard)
 
 router.get('/detail/:cardId/comment', isLogin, CardController.getComment)
 router.post('/detail/:cardId/comment', isLogin, CardController.postComment)
@@ -29,6 +31,7 @@ router.get('/:cardId/assign', isLogin, CardController.getAssignTo)
 router.post('/:cardId/assign', isLogin, CardController.postAssignTo)
 
 router.post('/:cardId/archieve', isLogin, CardController.postArchieved)
+router.post('/:listId/archiveall', isLogin, CardController.allCardArchive)
 router.get('/assign', isLogin, CardController.getUserTask)
 router.get('/:listId/card/archieve', isLogin, CardController.getArchieved)
 

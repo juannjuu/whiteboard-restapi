@@ -5,12 +5,14 @@ const errorHandler = require('../utils/error-handler')
 module.exports = {
     getAll : async (req, res) => {
         try {
-            const indexCard = await Card.find({ 
+            const indexCard = await Card.find(
+                { 
                     listId: req.params.listId,
                     isArchieved: {
                         $ne: true
                     }
-            })
+                }
+            )
             if(!indexCard) {
                 res.status(400).json({
                     status: 'Not Found',
@@ -229,6 +231,35 @@ module.exports = {
                 })
             }
             const updateCard = await Card.updateOne({_id: cardId}, {isArchieved: true})
+            res.status(201).send({
+                status: 'Created',
+                message: 'Archieved Succesfully',
+                result: updateCard
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+    allCardArchive : async(req, res) => {
+        try {
+            const getCard = await Card.find({
+                listId: req.params.listId
+            })
+            if(!getCard) {
+                res.status(400).json({
+                    status: 'Not Found',
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+            const updateCard = await Card.updateMany(
+                {
+                    listId: req.params.listId
+                },
+                {
+                    isArchieved: true
+                }
+            )
             res.status(201).send({
                 status: 'Created',
                 message: 'Archieved Succesfully',
@@ -644,4 +675,133 @@ module.exports = {
             errorHandler(res, error)
         }
     },
+
+    copyAllCard : async(req, res) => {
+        try {
+            let pasteArray = []
+            let arr = []
+            let obj
+            const indexCard = await Card.find(
+                { 
+                    listId: req.params.listId,
+                    isArchieved: {
+                        $ne: true
+                    }
+                },
+                {
+                    _id: 0
+                }
+            )
+
+            for(let i = 0; i < indexCard.length; i++) {
+                indexCard[i].listId = req.params.listDest
+                for(let j of indexCard[i].attachment) {
+                    obj = {}
+                    obj.fileName = j.fileName
+                    obj.linkFile = j.linkFile
+                    arr.push(obj)
+                }
+                indexCard[i].attachment = arr
+                arr = []
+                for(let k of indexCard[i].assignTo) {
+                    obj = {}
+                    obj.userId = k.userId
+                    obj.name = k.name
+                    arr.push(obj)
+                }
+                indexCard[i].assignTo = arr
+                arr = []
+                for(let l of indexCard[i].comments) {
+                    obj = {}
+                    obj.userId = l.userId
+                    obj.name = l.name
+                    obj.comment = l.comment
+                    arr.push(obj)
+                }
+                indexCard[i].comments = arr
+                arr = []
+                for(let m of indexCard[i].checklist) {
+                    obj = {}
+                    obj.name = m.name
+                    obj.isChecked = m.isChecked
+                    arr.push(obj)
+                }
+                indexCard[i].checklist = arr
+                indexCard[i].createdAt = Date.now()
+                pasteArray.push(indexCard[i])
+            }
+
+            const newArray = await Card.insertMany(pasteArray)
+
+            res.status(200).json({
+                status: 200,
+                message: 'Copied Successfully',
+                result: newArray
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+
+    copyOneCard : async(req, res) => {
+        try {
+            let arr = []
+            let obj
+            const getCard = await Card.findOne(
+                {
+                    _id: req.params.cardId
+                },
+                {
+                    _id: 0
+                }
+            )
+            
+            getCard.listId = req.params.listDest
+            for(let j of getCard.attachment) {
+                obj = {}
+                obj.fileName = j.fileName
+                obj.linkFile = j.linkFile
+                arr.push(obj)
+            }
+            getCard.attachment = arr
+            arr = []
+            for(let k of getCard.assignTo) {
+                obj = {}
+                obj.userId = k.userId
+                obj.name = k.name
+                arr.push(obj)
+            }
+            getCard.assignTo = arr
+            arr = []
+            for(let l of getCard.comments) {
+                obj = {}
+                obj.userId = l.userId
+                obj.name = l.name
+                obj.comment = l.comment
+                arr.push(obj)
+            }
+            getCard.comments = arr
+            arr = []
+            for(let m of getCard.checklist) {
+                obj = {}
+                obj.name = m.name
+                obj.isChecked = m.isChecked
+                arr.push(obj)
+            }
+            getCard.checklist = arr
+            getCard.createdAt = Date.now()
+            
+            const pasteCard = await Card.insertMany(getCard)
+
+            res.status(200).json({
+                status: 200,
+                message: 'Successfully paste',
+                result: pasteCard
+            })
+            
+
+        } catch(error) {
+            errorHandler(res, error)
+        }
+    }
 }
