@@ -5,9 +5,6 @@ const assignSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "users",
         required: true
-    },
-    name: {
-        type: String
     }
 })
 
@@ -16,9 +13,6 @@ const commentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "users",
         required: true
-    },
-    name: {
-        type: String
     },
     comment: {
         type: String
