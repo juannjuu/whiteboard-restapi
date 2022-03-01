@@ -5,7 +5,7 @@ const PasswordReset = require("../models/passwordreset");
 const bcrypt = require("bcrypt");
 const errorHandler = require("../utils/error-handler");
 const random = require("randomstring");
-const sendMail = require("../utils/mail-sender");
+const {sendEmail} = require("../utils/mail-sender");
 
 module.exports = {
     register: async(req, res) => {
@@ -34,6 +34,13 @@ module.exports = {
                 },
                 process.env.JWT_KEY, { expiresIn: 60 * 60 * 12 }
             );
+
+            await sendEmail(
+                body.email,
+                'Welcome To Whiteboard!',
+                body.name
+            )
+
             res.status(201).json({
                 status: "Created",
                 message: "Registered successfuly",
