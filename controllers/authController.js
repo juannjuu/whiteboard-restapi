@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
 const Users = require("../models/user");
-const Profile = require("../models/profile")
+const Profile = require("../models/profile");
 const PasswordReset = require("../models/passwordreset");
 const bcrypt = require("bcrypt");
-const catchHandler = require("../utils/catch-handler");
+const errorHandler = require("../utils/error-handler");
 const random = require("randomstring");
 const sendMail = require("../utils/mail-sender");
 
@@ -27,22 +27,22 @@ module.exports = {
                 email: body.email,
                 password: hashedPassword,
             });
-            const profile = await Profile.create({userId : user._id})
+            const profile = await Profile.create({ userId: user._id });
             const token = jwt.sign({
                     id: user._id,
                     email: user.email,
                 },
-                process.env.JWT_SECRET, { expiresIn: 60 * 60 * 12 }
+                process.env.JWT_KEY, { expiresIn: 60 * 60 * 12 }
             );
             res.status(201).json({
                 status: "Created",
                 message: "Registered successfuly",
                 result: user,
-                token : token,
-                profile : profile
+                token: token,
+                profile: profile,
             });
         } catch (error) {
-            catchHandler(res, error);
+            errorHandler(res, error);
         }
     },
     login: async(req, res) => {
@@ -67,7 +67,7 @@ module.exports = {
                 });
             }
             const token = jwt.sign({ email: user.email, id: user.id },
-                process.env.JWT_SECRET, {
+                process.env.JWT_KEY, {
                     expiresIn: "12h",
                 }
             );
@@ -80,7 +80,7 @@ module.exports = {
                 },
             });
         } catch (error) {
-            catchHandler(res, error);
+            errorHandler(res, error);
         }
     },
     forgotPassword: async(req, res) => {
@@ -177,7 +177,7 @@ module.exports = {
                 result: {},
             });
         } catch (error) {
-            catchHandler(res, error);
+            errorHandler(res, error);
         }
     },
     resetPassword: async(req, res) => {
@@ -219,7 +219,7 @@ module.exports = {
                 result: {},
             });
         } catch (error) {
-            catchHandler(res, error);
+            errorHandler(res, error);
         }
     },
     googleCallback: async(req, res) => {
@@ -235,7 +235,7 @@ module.exports = {
                 });
             }
             const token = jwt.sign({ email: user.email, id: user._id },
-                process.env.JWT_SECRET
+                process.env.JWT_KEY
             );
             res.cookie("token", token);
             res.redirect("/");
@@ -257,7 +257,7 @@ module.exports = {
                 });
             }
             const token = jwt.sign({ email: user.email, id: user._id },
-                process.env.JWT_SECRET
+                process.env.JWT_KEY
             );
             res.cookie("token", token);
             res.redirect("/");
