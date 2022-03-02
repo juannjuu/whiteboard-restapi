@@ -183,7 +183,9 @@ module.exports = {
     getOneUser : async (req, res) => {
         const body = req.body
         try {
-            const user = await User.findOne({email : body.email})
+            const user = await User.findOne({email : body.email}).populate({
+                path: "profileId"
+            })
             if(!user){
                 return res.status(404).json({
                     status: "Not Found",
@@ -191,16 +193,17 @@ module.exports = {
                     result: {}
                 })
             }
-            const profile = await Profile.findOne({userId : user._id})
-            if(!profile){
-                return res.status(404).json({
-                    status: "Not Found",
-                    message: "Profile is Not Found",
-                })
-            }
+            // const profile = await Profile.findOne({userId : user._id})
+            // if(!profile){
+            //     return res.status(404).json({
+            //         status: "Not Found",
+            //         message: "Profile is Not Found",
+            //     })
+            // }
             const userResult = {
                 email : user.email,
                 name : user.name,
+                profileImage : user.profileId.image
             }
             res.status(200).json({
                 status: "OK",
@@ -220,7 +223,7 @@ module.exports = {
                 path : "profileId",
                 select : "image"
             })
-            if(!user){
+            if(user.length == 0) {
                 return res.status(404).json({
                     status: "Not Found",
                     message: "User not found",
