@@ -21,7 +21,7 @@ const schema = new Schema({
     profileId : {
         type : Schema.Types.ObjectId,
         ref : "profiles",
-        required : true,
+        required: true
     }
 })
 
