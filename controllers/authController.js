@@ -22,12 +22,16 @@ module.exports = {
                 });
             }
             const hashedPassword = await bcrypt.hash(body.password, 10);
-            const user = await Users.create({
+            const user = new Users({
                 name: body.name,
                 email: body.email,
                 password: hashedPassword,
             });
-            const profile = await Profile.create({userId : user._id})
+            const profile = new Profile({userId : user._id})
+            user.profileId = profile._id
+            await user.save()
+            await profile.save()
+
             const token = jwt.sign({
                     id: user._id,
                     email: user.email,

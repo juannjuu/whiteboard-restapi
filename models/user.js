@@ -17,6 +17,11 @@ const schema = new Schema({
     createdAt : {
         type: Date,
         default : Date.now()
+    },
+    profileId : {
+        type : Schema.Types.ObjectId,
+        ref : "profiles",
+        required: true
     }
 })
 
