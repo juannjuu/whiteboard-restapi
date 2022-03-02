@@ -256,7 +256,6 @@ module.exports = {
                 status: "OK",
                 message: "Invite members is success",
                 result: arrMember
-                // result: user
             })
         } catch (error) {
             errorHandler(res, error)
