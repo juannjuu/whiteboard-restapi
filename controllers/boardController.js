@@ -309,15 +309,15 @@ module.exports = {
 </body>   `
                     )
             }
-            // const updateMember = await Board.findOneAndUpdate({_id : boardId}, {
-            //     $push: {members : arrMember}
-            // }, {new: true})
-            // if(!updateMember){
-            //     return res.status(500).json({
-            //         status: "Internal Server Error",
-            //         message: "Invite members is Failed",
-            //     })
-            // }
+            const updateMember = await Board.findOneAndUpdate({_id : boardId}, {
+                $push: {members : arrMember}
+            }, {new: true})
+            if(!updateMember){
+                return res.status(500).json({
+                    status: "Internal Server Error",
+                    message: "Invite members is Failed",
+                })
+            }
             res.status(201).json({
                 status: "OK",
                 message: "Invite members is success",
