@@ -28,89 +28,6 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-    getBoardDetail : async (req, res) => {
-        const {boardId} = req.params
-        try {
-            const lists = await List.find({boardId: boardId})
-            if(lists.length == 0) {
-                return res.status(404).json({
-                    status: 'Not Found',
-                    message: `No list created`,
-                    result : {}
-                })
-            }
-            res.status(200).json({
-                status: 'OK',
-                message: `List with boardId ${boardId}`,
-                result : lists
-            })
-        } catch (error) {
-            errorHandler(res, error)
-        }
-    },
-    createList : async (req, res) => {
-        const {boardId} = req.params
-        const body = req.body
-        try {
-            const schema = Joi.object({
-                title : Joi.string().required()
-            })
-            const {error} = schema.validate(body)
-            if (error) {
-                return res.status(400).json({
-                  status: "Bad Request",
-                  message: error.message,
-                });
-            }
-            const list = await List.create({boardId: boardId, title: body.title})
-            if(!list){
-                return res.status(500).json({
-                    status: "Internal Server Error",
-                    message: "Failed to create list"
-                })
-            }
-            res.status(201).json({
-                status: "Created",
-                message: "List created successfully",
-                result: list
-            })
-        } catch (error) {
-            errorHandler(res, error)
-        }
-    },
-    renameList : async (req, res) => {
-        const {listId} = req.params
-        try {
-            if(!req.body.title){
-                return res.status(400).json({
-                    status: "Bad Request",
-                    message: "Title is required",
-                })
-            }
-            const list = await List.findOne({_id : listId})
-            if(!list){
-                return res.status(404).json({
-                    status: "Not Found",
-                    message: "List not found",
-                    return: {}
-                })
-            }
-            const update = await List.findOneAndUpdate({_id : listId}, {title: req.body.title}, {new: true})
-            if(!update){
-                return res.status(500).json({
-                    status: "Internal Server Error",
-                    message: "Rename Title is Failed",
-                })
-            }
-            res.status(201).json({
-                status: "Created",
-                message: "Rename Title is Success",
-                result: update
-            })
-        } catch (error) {
-            errorHandler(res, error)
-        }
-    },
     createBoard : async (req, res) => {
         const {teamId} = req.params
         const body = req.body
@@ -153,29 +70,121 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-    getBoardMembers : async (req, res) => {
+    getBoardDetail : async (req, res) => {
         const {boardId} = req.params
         try {
-            const members = await Board.find({_id: boardId}).select({"members" : 1})
-            if(members.length == 0){
+            const checkUser = await Board.findOne({_id: boardId})
+            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            if(!existUser) {
+                return res.status(401).json({
+                    status: 'Unauthorized',
+                    message: 'You are not a member of this board'
+                })
+            }
+            const lists = await List.find({boardId: boardId})
+            if(lists.length == 0) {
                 return res.status(404).json({
-                    status: "Not Found",
-                    message: "No member found"
+                    status: 'Not Found',
+                    message: `No list created`,
+                    result : {}
                 })
             }
             res.status(200).json({
-                status: "OK",
-                message: "Board members found",
-                result: members
+                status: 'OK',
+                message: `List with boardId ${boardId}`,
+                result : lists
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+    createList : async (req, res) => {
+        const {boardId} = req.params
+        const body = req.body
+        try {
+            const checkUser = await Board.findOne({_id: boardId})
+            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            if(!existUser) {
+                return res.status(401).json({
+                    status: 'Unauthorized',
+                    message: 'You are not a member of this board'
+                })
+            }
+            if(!req.body.title){
+                return res.status(400).json({
+                    status: "Bad Request",
+                    message: "Title is required",
+                })
+            }
+            const list = await List.create({boardId: boardId, title: body.title})
+            if(!list){
+                return res.status(500).json({
+                    status: "Internal Server Error",
+                    message: "Failed to create list"
+                })
+            }
+            res.status(201).json({
+                status: "Created",
+                message: "List created successfully",
+                result: list
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+    renameList : async (req, res) => {
+        const {listId, boardId} = req.params
+        try {
+            const checkUser = await Board.findOne({_id: boardId})
+            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            if(!existUser) {
+                return res.status(401).json({
+                    status: 'Unauthorized',
+                    message: 'You are not a member of this board'
+                })
+            }
+            if(!req.body.title){
+                return res.status(400).json({
+                    status: "Bad Request",
+                    message: "Title is required",
+                })
+            }
+            const list = await List.findOne({_id : listId})
+            if(!list){
+                return res.status(404).json({
+                    status: "Not Found",
+                    message: "List not found",
+                    return: {}
+                })
+            }
+            const update = await List.findOneAndUpdate({_id : listId}, {title: req.body.title}, {new: true})
+            if(!update){
+                return res.status(500).json({
+                    status: "Internal Server Error",
+                    message: "Rename Title is Failed",
+                })
+            }
+            res.status(201).json({
+                status: "Created",
+                message: "Rename Title is Success",
+                result: update
             })
         } catch (error) {
             errorHandler(res, error)
         }
     },
     archiveList : async (req, res) => {
-        const {listId} = req.params
+        const {listId, boardId} = req.params
         let archive
         try {
+            const checkUser = await Board.findOne({_id: boardId})
+            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            if(!existUser) {
+                return res.status(401).json({
+                    status: 'Unauthorized',
+                    message: 'You are not a member of this board'
+                })
+            }
             const list = await List.findOne({_id: listId})
             if(!list){
                 return res.status(404).json({
@@ -214,9 +223,116 @@ module.exports = {
             errorHandler(res, error)
         }
     },
+    copyList : async (req, res) => {
+        const {listId, boardId} = req.params
+        var cardResult = []
+        try {
+            const checkUser = await Board.findOne({_id: boardId})
+            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            if(!existUser) {
+                return res.status(401).json({
+                    status: 'Unauthorized',
+                    message: 'You are not a member of this board'
+                })
+            }
+            const list = await List.findOne({_id: listId})
+            if(!list){
+                return res.status(404).json({
+                    status: "Not Found",
+                    message: "No list found"
+                })
+            }
+            const cards = await Card.find({listId : listId})
+            if(!cards){
+                return res.status(404).json({
+                    status: "Not Found",
+                    message: "No cards found"
+                })
+            }
+            const copyList = await List.create({
+                boardId : list.boardId,
+                title : "[COPY] " + list.title
+            })
+            if(!copyList){
+                return res.status(500).json({
+                    status: "Internal Server Error",
+                    message: "Copy List is Failed"
+                })
+            }
+            for(let i in cards){
+                var copyCard = await new Card({
+                    listId: copyList._id,
+                    title: cards[i].title,
+                    desc: cards[i].desc,
+                    labels: cards[i].labels,
+                    attachment: cards[i].attachment,
+                    isArchieved: cards[i].isArchieved,
+                    assignTo: cards[i].assignTo,
+                    comments: cards[i].comments,
+                    checklist: cards[i].checklist,
+                    priority: cards[i].priority,
+                    dueDate: cards[i].dueDate
+                }).save()
+                if(!copyCard){
+                    return res.status(500).json({
+                        status: "Internal Server Error",
+                        message: "Copy List is Failed"
+                    })
+                }
+                cardResult.push(copyCard)   
+            }
+            res.status(200).json({
+                status : "OK",
+                message: "Copy List is Success",
+                result: {
+                    copyList,
+                    cardResult
+                }
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+    getBoardMembers : async (req, res) => {
+        const {boardId} = req.params
+        try {
+            const checkUser = await Board.findOne({_id: boardId})
+            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            if(!existUser) {
+                return res.status(401).json({
+                    status: 'Unauthorized',
+                    message: 'You are not a member of this board'
+                })
+            }
+            const members = await Board.find({_id: boardId}).select({"members" : 1})
+            if(members.length == 0){
+                return res.status(404).json({
+                    status: "Not Found",
+                    message: "No member found"
+                })
+            }
+            console.log(members)
+            res.status(200).json({
+                status: "OK",
+                message: "Board members found",
+                result: members
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
     getOneUser : async (req, res) => {
         const body = req.body
+        const {boardId} = req.params
         try {
+            const checkUser = await Board.findOne({_id: boardId})
+            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            if(!existUser) {
+                return res.status(401).json({
+                    status: 'Unauthorized',
+                    message: 'You are not a member of this board'
+                })
+            }
             const user = await User.findOne({email : body.email}).populate({
                 path: "profileId"
             })
@@ -246,6 +362,14 @@ module.exports = {
         const body = req.body
         var arrMember = []
         try {
+            const checkUser = await Board.findOne({_id: boardId})
+            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            if(!existUser) {
+                return res.status(401).json({
+                    status: 'Unauthorized',
+                    message: 'You are not a member of this board'
+                })
+            }
             const userLogin = await User.findOne({_id : req.user.id})
             const user = await User.find({email : body.email}).populate({
                 path : "profileId",
@@ -360,66 +484,4 @@ module.exports = {
             errorHandler(res, error)
         }
     },
-    copyList : async (req, res) => {
-        const {listId} = req.params
-        var cardResult = []
-        try {
-            const list = await List.findOne({_id: listId})
-            if(!list){
-                return res.status(404).json({
-                    status: "Not Found",
-                    message: "No list found"
-                })
-            }
-            const cards = await Card.find({listId : listId})
-            if(!cards){
-                return res.status(404).json({
-                    status: "Not Found",
-                    message: "No cards found"
-                })
-            }
-            const copyList = await List.create({
-                boardId : list.boardId,
-                title : "[COPY] " + list.title
-            })
-            if(!copyList){
-                return res.status(500).json({
-                    status: "Internal Server Error",
-                    message: "Copy List is Failed"
-                })
-            }
-            for(let i in cards){
-                var copyCard = await new Card({
-                    listId: copyList._id,
-                    title: cards[i].title,
-                    desc: cards[i].desc,
-                    labels: cards[i].labels,
-                    attachment: cards[i].attachment,
-                    isArchieved: cards[i].isArchieved,
-                    assignTo: cards[i].assignTo,
-                    comments: cards[i].comments,
-                    checklist: cards[i].checklist,
-                    priority: cards[i].priority,
-                    dueDate: cards[i].dueDate
-                }).save()
-                if(!copyCard){
-                    return res.status(500).json({
-                        status: "Internal Server Error",
-                        message: "Copy List is Failed"
-                    })
-                }
-                cardResult.push(copyCard)   
-            }
-            res.status(200).json({
-                status : "OK",
-                message: "Copy List is Success",
-                result: {
-                    copyList,
-                    cardResult
-                }
-            })
-        } catch (error) {
-            errorHandler(res, error)
-        }
-    }
 }
