@@ -78,6 +78,39 @@ module.exports = {
             errorHandler(res, error)
         }
     },
+    renameList : async (req, res) => {
+        const {listId} = req.params
+        try {
+            if(!req.body.title){
+                return res.status(400).json({
+                    status: "Bad Request",
+                    message: "Title is required",
+                })
+            }
+            const list = await List.findOne({_id : listId})
+            if(!list){
+                return res.status(404).json({
+                    status: "Not Found",
+                    message: "List not found",
+                    return: {}
+                })
+            }
+            const update = await List.findOneAndUpdate({_id : listId}, {title: req.body.title}, {new: true})
+            if(!update){
+                return res.status(500).json({
+                    status: "Internal Server Error",
+                    message: "Rename Title is Failed",
+                })
+            }
+            res.status(201).json({
+                status: "Created",
+                message: "Rename Title is Success",
+                result: update
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
     createBoard : async (req, res) => {
         const {teamId} = req.params
         const body = req.body

@@ -13,7 +13,8 @@ router.put("/members/:boardId/member", isLogin, BoardController.inviteMembers)
 router.get("/board/:boardId", isLogin, BoardController.getBoardDetail)
 
 router.post("/:boardId/list", isLogin, BoardController.createList)
-router.put("/:listId/archive", isLogin, BoardController.archiveList)
-router.post("/:listId/copy", isLogin, BoardController.copyList)
+router.put("/:boardId/:listId/rename", isLogin, BoardController.renameList)
+router.put("/:boardId/:listId/archive", isLogin, BoardController.archiveList)
+router.post("/:boardId/:listId/copy", isLogin, BoardController.copyList)
 
 module.exports = router
