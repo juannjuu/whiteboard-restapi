@@ -1,5 +1,6 @@
 const Card = require('../models/card')
-const User = require('../models/user')
+const List = require('../models/list')
+const Board = require('../models/board')
 const errorHandler = require('../utils/error-handler')
 
 module.exports = {
@@ -199,7 +200,7 @@ module.exports = {
                     _id: cardId
                 }, 
                 {
-                    $set: {
+                    $push: {
                         assignTo: req.body.assignTo
                     }
                 },
@@ -232,7 +233,8 @@ module.exports = {
                         userId: user.id
                     }
                 }
-            })
+            }).populate({path: 'listId', select: 'boardId title'})
+
             if (!findCard) {
                 res.status(400).json({
                     status: 'Not Found',
