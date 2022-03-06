@@ -6,7 +6,14 @@ const Board = require('../models/board')
 module.exports = {
     getTeam : async(req, res) => {
         try {
-            const findTeam = await Team.find()
+            let user = req.user
+            const findTeam = await Team.find({
+                members: {
+                    $elemMatch: {
+                        userId: user.id
+                    }
+                }
+            })
             res.status(200).send({
                 status: "OK",
                 message: 'Team is found',
@@ -18,8 +25,14 @@ module.exports = {
     },
     createTeam : async(req, res) => {
         try {
-            let body = req.body
-            let teamNew = new Team(body)
+            let user = req.user
+            let members = {
+                userId: user.id
+            }
+            let teamNew = new Team({
+                teamName: req.body.teamName,
+                members: members
+            })
             await teamNew.save(teamNew)
             res.status(201).send({
                 status: "Created",
