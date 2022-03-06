@@ -41,7 +41,7 @@ module.exports = {
         try {
             const profile = await Profile.findOne({userId : user.id}).populate({
                 path: "userId",
-                select: "name"
+                select: ["name", "email"]
             })
             if(!profile) {
                 return res.status(404).json({
