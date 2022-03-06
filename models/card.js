@@ -72,6 +72,10 @@ const schema = new Schema({
     checklist: {
         type: [checklistSchema]
     },
+    isDone: {
+        type: Boolean,
+        default: false
+    },
     isArchieved: {
         type: Boolean,
         default: false

@@ -836,5 +836,108 @@ module.exports = {
         } catch(error) {
             errorHandler(res, error)
         }
+    },
+
+    isDone : async(req, res) => {
+        try {
+            let checking = true
+            const getCard = await Card.findOne({
+                _id: req.params.cardId
+            })
+            if(!getCard) {
+                res.status(400).json({
+                    status: 'Not Found',
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+            if(getCard.isDone != false) {
+                checking = false
+            }
+            const updateCard = await Card.updateOne(
+                {
+                    _id: req.params.cardId
+                },
+                {
+                    isDone: checking
+                },
+                {
+                    // returnDocument: 'after'
+                    new: true
+                }
+            )
+            res.status(200).send({
+                status: "OK",
+                message: 'Checked!',
+                result: updateCard
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+
+    getCountUserDoneTask : async(req, res) => {
+        let user = req.user
+        let listId = []
+        const getBoard = await Board.findOne({
+            _id: req.params.boardId
+        })
+
+        const getList = await List.find({
+            boardId: getBoard._id
+        })
+
+        for(let i = 0; i < getList.length; i++) {
+            listId.push(getList[i]._id)
+        }
+
+        const getCount = await Card.find({
+            listId: {
+                $in: listId
+            },
+            assignTo: {
+                $elemMatch: {
+                    userId: user.id
+                }
+            },
+            isDone: true
+        }).countDocuments()
+
+        res.send({
+            result: 
+                getCount
+        })
+    },
+
+    getCountAllUserTask : async(req, res) => {
+        let user = req.user
+        let listId = []
+        const getBoard = await Board.findOne({
+            _id: req.params.boardId
+        })
+
+        const getList = await List.find({
+            boardId: getBoard._id
+        })
+
+        for(let i = 0; i < getList.length; i++) {
+            listId.push(getList[i]._id)
+        }
+
+        const getCount = await Card.find({
+            listId: {
+                $in: listId
+            },
+            assignTo: {
+                $elemMatch: {
+                    userId: user.id
+                }
+            }
+        }).countDocuments()
+
+        res.send({
+            result: 
+                getCount
+        })
     }
 }

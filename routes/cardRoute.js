@@ -35,4 +35,7 @@ router.post('/archieveall/:listId', isLogin, CardController.allCardArchive)
 router.get('/userassign/task', isLogin, CardController.getUserTask)
 router.get('/archieve/:listId', isLogin, CardController.getArchieved)
 
+router.get('/userassign/done/:boardId', isLogin, CardController.getCountUserDoneTask)
+router.get('/userassign/all/:boardId', isLogin, CardController.getCountAllUserTask)
+
 module.exports = router
