@@ -10,7 +10,7 @@ router.get("/members/:boardId", isLogin, BoardController.getBoardMembers)
 router.get("/members/:boardId/member", isLogin, BoardController.getOneUser)
 router.put("/members/:boardId/member", isLogin, BoardController.inviteMembers)
 
-router.get("/board/:boardId", isLogin, BoardController.getBoardDetail)
+router.get("/detail/:boardId", isLogin, BoardController.getBoardDetail)
 
 router.post("/:boardId/list", isLogin, BoardController.createList)
 router.put("/:boardId/:listId/rename", isLogin, BoardController.renameList)
