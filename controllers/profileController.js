@@ -39,7 +39,10 @@ module.exports = {
     getProfile : async (req, res) => {
         const user = req.user
         try {
-            const profile = await Profile.findOne({userId : user.id})
+            const profile = await Profile.findOne({userId : user.id}).populate({
+                path: "userId",
+                select: "name"
+            })
             if(!profile) {
                 return res.status(404).json({
                     status: "Not Found",
