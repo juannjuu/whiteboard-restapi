@@ -21,8 +21,8 @@ module.exports = async(email, subject, content) => {
         });
 
         console.log("Message sent: %s", info.messageId);
-
         console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        console.log(info);
     } catch (error) {
         console.log(error);
     }

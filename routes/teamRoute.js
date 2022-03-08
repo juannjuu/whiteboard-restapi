@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const {isLogin} = require("../middlewares/auth")
 const TeamController = require('../controllers/teamController')
 
-router.get('/:userId', TeamController.getTeam)
-router.post('/', TeamController.createTeam)
-router.get('/detail/:teamId', TeamController.getDetailTeam)
+router.get('/', isLogin, TeamController.getTeam)
+router.post('/', isLogin, TeamController.createTeam)
+router.get('/detail/:teamId', isLogin, TeamController.getDetailTeam)
 
 module.exports = router
