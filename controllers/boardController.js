@@ -73,8 +73,8 @@ module.exports = {
     getBoardDetail : async (req, res) => {
         const {boardId} = req.params
         try {
-            const checkUser = await Board.findOne({_id: boardId})
-            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            const checkBoard = await Board.findOne({_id: boardId})
+            const existUser = checkBoard.members.find((x, i) => req.user.id.toString() == checkBoard.members[i].userId.toString())
             if(!existUser) {
                 return res.status(401).json({
                     status: 'Unauthorized',
@@ -89,10 +89,14 @@ module.exports = {
                     result : {}
                 })
             }
+            const result = {
+                title: checkBoard.title,
+                lists: lists,
+            }
             res.status(200).json({
                 status: 'OK',
-                message: `List with boardId ${boardId}`,
-                result : lists
+                message: `Get Detail BoardId ${boardId} is Success`,
+                result : result
             })
         } catch (error) {
             errorHandler(res, error)
@@ -102,8 +106,8 @@ module.exports = {
         const {boardId} = req.params
         const body = req.body
         try {
-            const checkUser = await Board.findOne({_id: boardId})
-            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            const checkBoard = await Board.findOne({_id: boardId})
+            const existUser = checkBoard.members.find((x, i) => req.user.id.toString() == checkBoard.members[i].userId.toString())
             if(!existUser) {
                 return res.status(401).json({
                     status: 'Unauthorized',
@@ -135,8 +139,8 @@ module.exports = {
     renameList : async (req, res) => {
         const {listId, boardId} = req.params
         try {
-            const checkUser = await Board.findOne({_id: boardId})
-            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            const checkBoard = await Board.findOne({_id: boardId})
+            const existUser = checkBoard.members.find((x, i) => req.user.id.toString() == checkBoard.members[i].userId.toString())
             if(!existUser) {
                 return res.status(401).json({
                     status: 'Unauthorized',
@@ -177,8 +181,8 @@ module.exports = {
         const {listId, boardId} = req.params
         let archive
         try {
-            const checkUser = await Board.findOne({_id: boardId})
-            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            const checkBoard = await Board.findOne({_id: boardId})
+            const existUser = checkBoard.members.find((x, i) => req.user.id.toString() == checkBoard.members[i].userId.toString())
             if(!existUser) {
                 return res.status(401).json({
                     status: 'Unauthorized',
@@ -227,8 +231,8 @@ module.exports = {
         const {listId, boardId} = req.params
         var cardResult = []
         try {
-            const checkUser = await Board.findOne({_id: boardId})
-            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            const checkBoard = await Board.findOne({_id: boardId})
+            const existUser = checkBoard.members.find((x, i) => req.user.id.toString() == checkBoard.members[i].userId.toString())
             if(!existUser) {
                 return res.status(401).json({
                     status: 'Unauthorized',
@@ -296,8 +300,8 @@ module.exports = {
     getBoardMembers : async (req, res) => {
         const {boardId} = req.params
         try {
-            const checkUser = await Board.findOne({_id: boardId})
-            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            const checkBoard = await Board.findOne({_id: boardId})
+            const existUser = checkBoard.members.find((x, i) => req.user.id.toString() == checkBoard.members[i].userId.toString())
             if(!existUser) {
                 return res.status(401).json({
                     status: 'Unauthorized',
@@ -325,8 +329,8 @@ module.exports = {
         const body = req.body
         const {boardId} = req.params
         try {
-            const checkUser = await Board.findOne({_id: boardId})
-            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            const checkBoard = await Board.findOne({_id: boardId})
+            const existUser = checkBoard.members.find((x, i) => req.user.id.toString() == checkBoard.members[i].userId.toString())
             if(!existUser) {
                 return res.status(401).json({
                     status: 'Unauthorized',
@@ -362,8 +366,8 @@ module.exports = {
         const body = req.body
         var arrMember = []
         try {
-            const checkUser = await Board.findOne({_id: boardId})
-            const existUser = checkUser.members.find((x, i) => req.user.id.toString() == checkUser.members[i].userId.toString())
+            const checkBoard = await Board.findOne({_id: boardId})
+            const existUser = checkBoard.members.find((x, i) => req.user.id.toString() == checkBoard.members[i].userId.toString())
             if(!existUser) {
                 return res.status(401).json({
                     status: 'Unauthorized',
