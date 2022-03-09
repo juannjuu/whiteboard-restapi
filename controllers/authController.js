@@ -1,6 +1,7 @@
+const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const Users = require("../models/user");
-const Profile = require("../models/profile")
+const Profile = require("../models/profile");
 const PasswordReset = require("../models/passwordreset");
 const bcrypt = require("bcrypt");
 const errorHandler = require("../utils/error-handler");
@@ -51,8 +52,8 @@ module.exports = {
                 status: "Created",
                 message: "Registered successfuly",
                 result: user,
-                token : token,
-                profile : profile
+                token: token,
+                profile: profile,
             });
         } catch (error) {
             errorHandler(res, error);
@@ -112,7 +113,8 @@ module.exports = {
                 validationCode: random.generate(50),
                 isDone: false,
             });
-            sendMail(
+            
+            sendEmail(
                 email,
                 "Password Reset",
                 `
@@ -129,8 +131,8 @@ module.exports = {
                     </tr>
                     <tr>
                         <td style="text-align:center;">
-                          <a href="https://laptop-app.com" title="logo" target="_blank">
-                            <img width="60" src="https://i.ibb.co/hL4XZp2/android-chrome-192x192.png" title="logo" alt="logo">
+                          <a href="https://whiteboardglints.herokuapp.com/" title="logo" target="_blank">
+                            <img width="200" src="https://res.cloudinary.com/dry2yqm3h/image/upload/v1646299280/image/whiteboard/whiteboard-logo_xbavgv.png" title="logo" alt="logo">
                           </a>
                         </td>
                     </tr>
@@ -146,18 +148,15 @@ module.exports = {
                                 </tr>
                                 <tr>
                                     <td style="padding:0 35px;">
-                                        <h1 style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;">You have
-                                            requested to reset your password</h1>
+                                        <h1 style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;">Password Reset</h1>
                                         <span
                                             style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
                                         <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
-                                            We cannot simply send you your old password. A unique link to reset your
-                                            password has been generated for you. To reset your password, click the
-                                            following link and follow the instructions.
+                                        Someone has requested a password reset for your account. Click the button below to set a new password.
                                         </p>
-                                        <a href="https://localhost:5000/api/v1/auth/forgot?code=${passwordReset.validationCode}"
-                                            style="background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Reset
-                                            Password</a>
+                                        <p style="color:#455056; font-size:15px;line-height:24px; margin:0;>If you don't wish to reset your password, disregard this email and no action will be taken.</p>
+                                        <a href="https://whiteboard-product.herokuapp.com/api/v1/auth/forgot?code=${passwordReset.validationCode}"
+                                            style="background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Click Here</a>
                                     </td>
                                 </tr>
                                 <tr>
@@ -170,7 +169,7 @@ module.exports = {
                     </tr>
                     <tr>
                         <td style="text-align:center;">
-                            <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>www.laptop-app.com</strong></p>
+                            <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>whiteboardproduct</strong></p>
                         </td>
                     </tr>
                     <tr>
@@ -221,9 +220,7 @@ module.exports = {
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
-
             await Users.updateOne({ email: validate.email }, { password: hashedPassword });
-
             await PasswordReset.updateOne({ isDone: true }, { validationCode: validationCode });
 
             res.status(200).json({
@@ -236,45 +233,18 @@ module.exports = {
         }
     },
     googleCallback: async(req, res) => {
-        const profile = req.user._json;
+        const profile = req.user;
+        console.log(req.user)
         let user;
         try {
-            user = await Users.findOne({ email: profile.email });
-            if (!user) {
-                user = await Users.create({
-                    email: profile.email,
-                    name: profile.name,
-                    password: "",
-                });
-            }
-            const token = jwt.sign({ email: user.email, id: user._id },
+            console.log(profile);
+            const token = jwt.sign({ email: profile.email, id: profile._id },
                 process.env.JWT_KEY
             );
             res.cookie("token", token);
-            res.redirect("/");
+            res.redirect("/?token=" + token);
         } catch (error) {
             console.log(error);
-            res.status(500).send("Internal Server Error");
-        }
-    },
-    facebookCallback: async(req, res) => {
-        const profile = req.user._json;
-        let user;
-        try {
-            user = await Users.findOne({ email: profile.email });
-            if (!user) {
-                user = await Users.create({
-                    email: profile.email,
-                    name: profile.name,
-                    password: "",
-                });
-            }
-            const token = jwt.sign({ email: user.email, id: user._id },
-                process.env.JWT_KEY
-            );
-            res.cookie("token", token);
-            res.redirect("/");
-        } catch (error) {
             res.status(500).send("Internal Server Error");
         }
     },

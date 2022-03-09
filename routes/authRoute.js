@@ -1,9 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const { register, login, forgotPassword, resetPassword} = require("../controllers/authController");
+const {
+    register,
+    login,
+    forgotPassword,
+    resetPassword,
+} = require("../controllers/authController");
 const passport = require("../config/passport");
-const { googleCallback, facebookCallback} = require("../controllers/authController");
-const {registerValidation, loginValidation} = require("../middlewares/authValidation")
+const { googleCallback } = require("../controllers/authController");
+const {
+    registerValidation,
+    loginValidation,
+} = require("../middlewares/authValidation");
 
 router.get(
     "/google",
@@ -11,20 +19,8 @@ router.get(
 );
 router.get(
     "/google/callback",
-    passport.authenticate("google", { failureRedirect: "/api/v1/auth/google" }),
+    passport.authenticate("google", { failureRedirect: "/api/v1/auth/google", session: false }),
     googleCallback
-);
-
-router.get(
-    "/facebook",
-    passport.authenticate("facebook", { scope: ["email"] })
-);
-router.get(
-    "/facebook/callback",
-    passport.authenticate("facebook", {
-        failureRedirect: "/api/v1/auth/facebook",
-    }),
-    facebookCallback
 );
 
 router.post("/register", registerValidation, register);
