@@ -84,7 +84,7 @@ const schema = new Schema({
         type: Date,
         default : Date.now()
     }
-})
+}, {strict: false})
 
 const Card = model("cards", schema)
 

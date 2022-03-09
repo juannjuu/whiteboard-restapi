@@ -143,9 +143,7 @@ module.exports = {
                 },
                 {
                     $set: {
-                        labels: {
-                            labels
-                        }
+                        labels: labels
                     }
                 },
                 {
@@ -200,7 +198,7 @@ module.exports = {
                     _id: cardId
                 }, 
                 {
-                    $push: {
+                    $set: {
                         assignTo: req.body.assignTo
                     }
                 },
@@ -227,25 +225,76 @@ module.exports = {
     getUserTask : async(req, res) => {
         try {
             let user = req.user
-            const findCard = await Card.find({
-                assignTo: {
-                    $elemMatch: {
-                        userId: user.id
+
+            const getCard = await Card.aggregate([
+                {
+                    '$match' : {
+                        'assignTo.userId': user.id,
+                        'isArchieved': false
+                    }
+                },
+                {
+                    '$lookup' : {
+                        'localField': "listId",
+                        'from': "lists",
+                        'foreignField': "_id",
+                        'as': "lists"
+                    }
+                },
+                {
+                    '$unwind' : {
+                        'path': '$lists',
+                        'preserveNullAndEmptyArrays': true
+                    }
+                },
+                {
+                    '$lookup' :  {
+                        'localField': "lists.boardId",
+                        'from': "boards",
+                        'foreignField': "_id",
+                        'as': "boards"
+                    }
+                },
+                {
+                    '$unwind' : {
+                        'path': '$boards',
+                        'preserveNullAndEmptyArrays': true
+                    }
+                },
+                {
+                    '$lookup' : {
+                        'localField': 'boards.teamId',
+                        'from': 'teams',
+                        'foreignField': '_id',
+                        'as': 'teams'
+                    }
+                },
+                {
+                    '$unwind' : {
+                        'path': '$teams',
+                        'preserveNullAndEmptyArrays': true
+                    }
+                },
+                {
+                    '$project' : {
+                        'id': 1,
+                        'title': 1,
+                        'dueDate': 1,
+                        'isDone': 1,
+                        'lists._id': 1,
+                        'lists.title': 1,
+                        'boards._id': 1,
+                        'boards.title': 1,
+                        'teams._id': 1,
+                        'teams.teamName': 1
                     }
                 }
-            }).populate({path: 'listId', select: 'boardId title'})
+            ])
 
-            if (!findCard) {
-                res.status(400).json({
-                    status: 'Not Found',
-                    message: 'There is no card!',
-                    result: {}
-                })
-            }
             res.status(200).send({
                 status: 'OK',
                 message: 'Task Found!',
-                result: findCard
+                result: getCard
             })
         } catch (error) {
             errorHandler(res, error)
@@ -878,22 +927,17 @@ module.exports = {
 
     getCountUserDoneTask : async(req, res) => {
         let user = req.user
-        let listId = []
         const getBoard = await Board.findOne({
             _id: req.params.boardId
-        })
+        }).select('_id')
 
         const getList = await List.find({
             boardId: getBoard._id
-        })
-
-        for(let i = 0; i < getList.length; i++) {
-            listId.push(getList[i]._id)
-        }
+        }).select('_id')
 
         const getCount = await Card.find({
             listId: {
-                $in: listId
+                $in: getList
             },
             assignTo: {
                 $elemMatch: {
@@ -903,30 +947,26 @@ module.exports = {
             isDone: true
         }).countDocuments()
 
-        res.send({
-            result: 
-                getCount
+        res.status(200).send({
+            status: "OK",
+            message: 'Found The Count!',
+            result: getCount
         })
     },
 
     getCountAllUserTask : async(req, res) => {
         let user = req.user
-        let listId = []
         const getBoard = await Board.findOne({
             _id: req.params.boardId
-        })
+        }).select('_id')
 
         const getList = await List.find({
             boardId: getBoard._id
-        })
-
-        for(let i = 0; i < getList.length; i++) {
-            listId.push(getList[i]._id)
-        }
+        }).select('_id')
 
         const getCount = await Card.find({
             listId: {
-                $in: listId
+                $in: getList
             },
             assignTo: {
                 $elemMatch: {
@@ -935,9 +975,10 @@ module.exports = {
             }
         }).countDocuments()
 
-        res.send({
-            result: 
-                getCount
+        res.status(200).send({
+            status: "OK",
+            message: 'Found The Count!',
+            result: getCount
         })
     }
 }
