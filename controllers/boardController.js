@@ -308,14 +308,22 @@ module.exports = {
                     message: 'You are not a member of this board'
                 })
             }
-            const members = await Board.find({_id: boardId}).select({"members" : 1})
+            const members = await Board.find({_id: boardId}).populate([
+                {
+                    path: "members.userId", select: "name"
+                },
+                {
+                    path: "members.profileId", select: "image"
+                }
+            ])
+                
+                {path: "members."}
             if(members.length == 0){
                 return res.status(404).json({
                     status: "Not Found",
                     message: "No member found"
                 })
             }
-            console.log(members)
             res.status(200).json({
                 status: "OK",
                 message: "Board members found",
