@@ -1,8 +1,7 @@
 const User = require('../models/user')
 const Profile = require('../models/profile')
 const errorHandler = require('../utils/error-handler')
-const {hashPassword, comparePassword} = require("../utils/bcrypt")
-const {generateToken} = require("../utils/jwt")
+const bcrypt = require("bcrypt")
 
 module.exports = {
     editProfile : async (req, res) => {
@@ -65,14 +64,14 @@ module.exports = {
             const users = await User.findOne({
                 _id: user.id
             });
-            const checkValid = await comparePassword(oldPassword, users.password);
+            const checkValid = await bcrypt.compare(oldPassword, users.password);
             if (!checkValid) {
                 return res.status(400).json({
                     status: "Bad Request",
                     message: "Password is not valid",
                 });
             }
-            const hash = hashPassword(newPassword);
+            const hash = await bcrypt.hash(newPassword, 10);
             const update = await User.updateOne({_id : user.id}, {password: hash});
             if (!update) {
                 return res.status(500).json({
@@ -83,27 +82,6 @@ module.exports = {
             res.status(201).json({
                 status: "OK",
                 message: "Change Password Success"
-            })
-        } catch (error) {
-            errorHandler(res, error);
-        }
-    },
-    changeEmail : async (req, res) => {
-        const body = req.body
-        const user = req.user
-        try {
-            const update = await User.updateOne({_id: user.id}, {email: body.email})
-            if (!update) {
-                return res.status(500).json({
-                    status: "Internal Server Error",
-                    message: "Update Email Failed"
-                })
-            }
-            const usernew = await User.findOne({_id: user.id})
-            res.status(201).json({
-                status: "OK",
-                message: "Change Email Success",
-                result: usernew.email
             })
         } catch (error) {
             errorHandler(res, error);
