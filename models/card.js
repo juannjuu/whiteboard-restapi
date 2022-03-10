@@ -72,6 +72,10 @@ const schema = new Schema({
     checklist: {
         type: [checklistSchema]
     },
+    isDone: {
+        type: Boolean,
+        default: false
+    },
     isArchieved: {
         type: Boolean,
         default: false
@@ -80,7 +84,7 @@ const schema = new Schema({
         type: Date,
         default : Date.now()
     }
-})
+}, {strict: false})
 
 const Card = model("cards", schema)
 

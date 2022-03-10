@@ -1,5 +1,6 @@
 const Card = require('../models/card')
-const User = require('../models/user')
+const List = require('../models/list')
+const Board = require('../models/board')
 const errorHandler = require('../utils/error-handler')
 
 module.exports = {
@@ -142,9 +143,7 @@ module.exports = {
                 },
                 {
                     $set: {
-                        labels: {
-                            labels
-                        }
+                        labels: labels
                     }
                 },
                 {
@@ -226,24 +225,76 @@ module.exports = {
     getUserTask : async(req, res) => {
         try {
             let user = req.user
-            const findCard = await Card.find({
-                assignTo: {
-                    $elemMatch: {
-                        userId: user.id
+
+            const getCard = await Card.aggregate([
+                {
+                    '$match' : {
+                        'assignTo.userId': user.id,
+                        'isArchieved': false
+                    }
+                },
+                {
+                    '$lookup' : {
+                        'localField': "listId",
+                        'from': "lists",
+                        'foreignField': "_id",
+                        'as': "lists"
+                    }
+                },
+                {
+                    '$unwind' : {
+                        'path': '$lists',
+                        'preserveNullAndEmptyArrays': true
+                    }
+                },
+                {
+                    '$lookup' :  {
+                        'localField': "lists.boardId",
+                        'from': "boards",
+                        'foreignField': "_id",
+                        'as': "boards"
+                    }
+                },
+                {
+                    '$unwind' : {
+                        'path': '$boards',
+                        'preserveNullAndEmptyArrays': true
+                    }
+                },
+                {
+                    '$lookup' : {
+                        'localField': 'boards.teamId',
+                        'from': 'teams',
+                        'foreignField': '_id',
+                        'as': 'teams'
+                    }
+                },
+                {
+                    '$unwind' : {
+                        'path': '$teams',
+                        'preserveNullAndEmptyArrays': true
+                    }
+                },
+                {
+                    '$project' : {
+                        'id': 1,
+                        'title': 1,
+                        'dueDate': 1,
+                        'isDone': 1,
+                        'lists._id': 1,
+                        'lists.title': 1,
+                        'boards._id': 1,
+                        'boards.title': 1,
+                        'teams._id': 1,
+                        'teams.teamName': 1
                     }
                 }
-            })
-            if (!findCard) {
-                res.status(400).json({
-                    status: 'Not Found',
-                    message: 'There is no card!',
-                    result: {}
-                })
-            }
+            ])
+
             res.status(200).send({
                 status: 'OK',
                 message: 'Task Found!',
-                result: findCard
+                result: getCard
             })
         } catch (error) {
             errorHandler(res, error)
@@ -834,5 +885,100 @@ module.exports = {
         } catch(error) {
             errorHandler(res, error)
         }
+    },
+
+    isDone : async(req, res) => {
+        try {
+            let checking = true
+            const getCard = await Card.findOne({
+                _id: req.params.cardId
+            })
+            if(!getCard) {
+                res.status(400).json({
+                    status: 'Not Found',
+                    message: 'Data not found',
+                    result: {}
+                })
+            }
+            if(getCard.isDone != false) {
+                checking = false
+            }
+            const updateCard = await Card.updateOne(
+                {
+                    _id: req.params.cardId
+                },
+                {
+                    isDone: checking
+                },
+                {
+                    // returnDocument: 'after'
+                    new: true
+                }
+            )
+            res.status(200).send({
+                status: "OK",
+                message: 'Checked!',
+                result: updateCard
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
+
+    getCountUserDoneTask : async(req, res) => {
+        let user = req.user
+        const getBoard = await Board.findOne({
+            _id: req.params.boardId
+        }).select('_id')
+
+        const getList = await List.find({
+            boardId: getBoard._id
+        }).select('_id')
+
+        const getCount = await Card.find({
+            listId: {
+                $in: getList
+            },
+            assignTo: {
+                $elemMatch: {
+                    userId: user.id
+                }
+            },
+            isDone: true
+        }).countDocuments()
+
+        res.status(200).send({
+            status: "OK",
+            message: 'Found The Count!',
+            result: getCount
+        })
+    },
+
+    getCountAllUserTask : async(req, res) => {
+        let user = req.user
+        const getBoard = await Board.findOne({
+            _id: req.params.boardId
+        }).select('_id')
+
+        const getList = await List.find({
+            boardId: getBoard._id
+        }).select('_id')
+
+        const getCount = await Card.find({
+            listId: {
+                $in: getList
+            },
+            assignTo: {
+                $elemMatch: {
+                    userId: user.id
+                }
+            }
+        }).countDocuments()
+
+        res.status(200).send({
+            status: "OK",
+            message: 'Found The Count!',
+            result: getCount
+        })
     }
 }
