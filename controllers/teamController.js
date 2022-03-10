@@ -24,6 +24,24 @@ module.exports = {
             errorHandler(res, error)
         }
     },
+    getOneTeam : async(req, res) => {
+        try {
+            let getTeam = await Team.find({_id : req.params.teamId}).select('_id teamName')
+            if (!getTeam) {
+                res.status(404).send({
+                    status: "Not Found",
+                    message: 'Data not found!'
+                })
+            }
+            res.status(200).send({
+                status: "OK",
+                message: 'Team Found!',
+                result: getTeam
+            })
+        } catch (error) {
+            errorHandler(res, error)
+        }
+    },
     createTeam : async(req, res) => {
         try {
             let user = req.user
