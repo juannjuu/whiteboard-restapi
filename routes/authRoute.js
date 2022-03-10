@@ -1,11 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {
-    register,
-    login,
-    forgotPassword,
-    resetPassword,
-} = require("../controllers/authController");
+const AuthController = require("../controllers/authController");
 const passport = require("../config/passport");
 const { googleCallback } = require("../controllers/authController");
 const {
@@ -23,9 +18,9 @@ router.get(
     googleCallback
 );
 
-router.post("/register", registerValidation, register);
-router.post("/login", loginValidation, login);
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
+router.post("/register", registerValidation, AuthController.register);
+router.post("/login", loginValidation, AuthController.login);
+router.post("/forgot-password", AuthController.forgotPassword);
+router.post("/reset-password", AuthController.resetPassword);
 
 module.exports = router;
