@@ -47,12 +47,11 @@ module.exports = {
     getDetailTeam: async(req, res) => {
         try {
             let user = req.user
-            let idTeam = req.params.teamId
 
             let getTeam = await Board.aggregate([
                 {
                     $match: {
-                        "teamId": mongoose.Types.ObjectId(idTeam),
+                        // "teamId": mongoose.Types.ObjectId(idTeam),
                         'members.userId': user.id,
                     }
                 },
@@ -73,10 +72,9 @@ module.exports = {
                 {
                     $project: {
                         '_id': 1,
-                        'teamId': 1,
                         'title': 1,
                         'teams._id': 1,
-                        'teams.teamName': 1
+                        'teams.teamName': 1,
                     }
                 }
             ])
