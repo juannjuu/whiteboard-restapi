@@ -17,7 +17,9 @@ module.exports = {
             }
             //flush token
             token = token.replace("Bearer ", "")
-            const decoded = verifyToken(token, process.env.JWT_KEY)
+            const decoded = jwt.verify(token, process.env.JWT_KEY, {
+                expiresIn: "12 hours"
+            })
             if (!decoded) {
                 return res.status(401).json({
                     message: "Token is not valid",
