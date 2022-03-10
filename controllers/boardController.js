@@ -11,7 +11,10 @@ module.exports = {
     getBoards : async (req, res) => {
         const {teamId} = req.params
         try {
-            const boards = await Board.find({teamId: teamId})
+            const boards = await Board.find({teamId: teamId}).populate({
+                path: "teamId", 
+                select: "teamName"
+            })
             if(boards.length == 0) {
                 return res.status(404).json({
                     status: 'Not Found',
