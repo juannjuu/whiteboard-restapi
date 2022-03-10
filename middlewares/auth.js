@@ -1,7 +1,5 @@
 const errorHandler = require('../utils/error-handler')
-const {
-    verifyToken
-} = require('../utils/jwt')
+const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
 module.exports = {
