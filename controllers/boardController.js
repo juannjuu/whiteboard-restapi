@@ -71,7 +71,7 @@ module.exports = {
             if(!pushBoard){
                 return res.status(500).json({
                     status: "Internal Server Error",
-                    message: "Push listId is Failed",
+                    message: "Push boardId is Failed",
                 })
             }
             res.status(201).json({
