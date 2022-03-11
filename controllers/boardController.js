@@ -3,6 +3,7 @@ const List = require("../models/list")
 const User = require("../models/user")
 const Profile = require("../models/profile")
 const Card = require("../models/card")
+const Team = require("../models/team")
 const Joi = require("joi");
 const errorHandler = require('../utils/error-handler')
 const {sendEmail} = require("../utils/mail-sender")
@@ -62,6 +63,15 @@ module.exports = {
                 return res.status(500).json({
                     status: "Internal Server Error",
                     message: "Failed to create board"
+                })
+            }
+            const pushBoard = await Team.findOneAndUpdate({_id : teamId}, {
+                $push: {boards : board._id}
+            }, {new: true})
+            if(!pushBoard){
+                return res.status(500).json({
+                    status: "Internal Server Error",
+                    message: "Push listId is Failed",
                 })
             }
             res.status(201).json({
@@ -128,6 +138,15 @@ module.exports = {
                 return res.status(500).json({
                     status: "Internal Server Error",
                     message: "Failed to create list"
+                })
+            }
+            const pushList = await Board.findOneAndUpdate({_id : boardId}, {
+                $push: {list : list._id}
+            }, {new: true})
+            if(!pushList){
+                return res.status(500).json({
+                    status: "Internal Server Error",
+                    message: "Push listId is Failed",
                 })
             }
             res.status(201).json({
