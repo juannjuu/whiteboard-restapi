@@ -7,6 +7,13 @@ const teamMember = new Schema({
     }
 })
 
+const boardSchema = new Schema({
+    boardId: {
+        type: Schema.Types.ObjectId,
+        ref: 'boards',
+    }
+})
+
 const schema = new Schema({
     teamName : {
         type: String,
@@ -16,7 +23,8 @@ const schema = new Schema({
         type: Date,
         default : Date.now()
     },
-    members: [teamMember]
+    members: [teamMember],
+    boards: [boardSchema]
 })
 
 const Team = model("teams", schema)

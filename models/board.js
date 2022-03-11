@@ -11,12 +11,20 @@ const userSchema = new Schema({
     }
 })
 
+const listSchema = new Schema({
+    listId: {
+        type: Schema.Types.ObjectId,
+        ref: 'lists',
+    }
+})
+
 const schema = new Schema({
     teamId : { 
         type: Schema.Types.ObjectId,
         ref: "teams",
         required: true
     },
+    list : [listSchema],
     title : {
         type: String,
         required: true

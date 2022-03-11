@@ -1,5 +1,12 @@
 const { Schema, model } = require("mongoose")
 
+const cardSchema = new Schema({
+    cardId: {
+        type: Schema.Types.ObjectId,
+        ref: 'cards',
+    }
+})
+
 const schema = new Schema({
     boardId: {
         type: Schema.Types.ObjectId,
@@ -10,6 +17,7 @@ const schema = new Schema({
         type: String,
         required: true
     },
+    cards: [cardSchema],
     isArchieved : {
         type: Boolean,
         default: false
