@@ -36,14 +36,29 @@ module.exports = {
             let listId = req.params.listId
             const cardNew = new Card({listId, ...body})
             await cardNew.save(cardNew)
-                .then((cardNew) => {
-                    res.status(201).send({
-                        status: 'Created',
-                        message: 'Created Succesfully',
-                        result: cardNew
-                    })
-                })
+            
+            let card = {
+                cardId: cardNew._id
+            }
 
+            console.log(card)
+
+            const addToList = await List.findOneAndUpdate(
+                {
+                    _id: listId
+                },
+                {
+                    $push: {
+                        cards: card
+                    }
+                }
+            )
+
+            res.status(201).send({
+                status: 'Created',
+                message: 'Created Succesfully',
+                result: cardNew
+            })
         } catch (error) {
             errorHandler(res, error)
         }
