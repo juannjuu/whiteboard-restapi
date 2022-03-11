@@ -225,68 +225,81 @@ module.exports = {
     getUserTask : async(req, res) => {
         try {
             let user = req.user
+            const limit = req.query.limit
+            let queryArr = []
+
+            queryArr.push({
+                $match : {
+                    'assignTo.userId': user.id,
+                    'isArchieved': false
+                }
+            })
+
+            if(limit) {
+                queryArr.push({'$limit': parseInt(limit)})
+            }
+
+            queryArr.push({
+                $lookup : {
+                    'localField': "listId",
+                    'from': "lists",
+                    'foreignField': "_id",
+                    'as': "lists"
+                }
+            },
+            {
+                $unwind : {
+                    'path': '$lists',
+                    'preserveNullAndEmptyArrays': true
+                }
+            },
+            {
+                $lookup :  {
+                    'localField': "lists.boardId",
+                    'from': "boards",
+                    'foreignField': "_id",
+                    'as': "boards"
+                }
+            },
+            {
+                $unwind : {
+                    'path': '$boards',
+                    'preserveNullAndEmptyArrays': true
+                }
+            },
+            {
+                $lookup : {
+                    'localField': 'boards.teamId',
+                    'from': 'teams',
+                    'foreignField': '_id',
+                    'as': 'teams'
+                }
+            },
+            {
+                $unwind : {
+                    'path': '$teams',
+                    'preserveNullAndEmptyArrays': true
+                }
+            },
+            {
+                $project : {
+                    'id': 1,
+                    'title': 1,
+                    'dueDate': 1,
+                    'isDone': 1,
+                    'lists._id': 1,
+                    'lists.title': 1,
+                    'boards._id': 1,
+                    'boards.title': 1,
+                    'teams._id': 1,
+                    'teams.teamName': 1
+                }
+            })
 
             const getCard = await Card.aggregate([
                 {
-                    '$match' : {
-                        'assignTo.userId': user.id,
-                        'isArchieved': false
-                    }
-                },
-                {
-                    '$lookup' : {
-                        'localField': "listId",
-                        'from': "lists",
-                        'foreignField': "_id",
-                        'as': "lists"
-                    }
-                },
-                {
-                    '$unwind' : {
-                        'path': '$lists',
-                        'preserveNullAndEmptyArrays': true
-                    }
-                },
-                {
-                    '$lookup' :  {
-                        'localField': "lists.boardId",
-                        'from': "boards",
-                        'foreignField': "_id",
-                        'as': "boards"
-                    }
-                },
-                {
-                    '$unwind' : {
-                        'path': '$boards',
-                        'preserveNullAndEmptyArrays': true
-                    }
-                },
-                {
-                    '$lookup' : {
-                        'localField': 'boards.teamId',
-                        'from': 'teams',
-                        'foreignField': '_id',
-                        'as': 'teams'
-                    }
-                },
-                {
-                    '$unwind' : {
-                        'path': '$teams',
-                        'preserveNullAndEmptyArrays': true
-                    }
-                },
-                {
-                    '$project' : {
-                        'id': 1,
-                        'title': 1,
-                        'dueDate': 1,
-                        'isDone': 1,
-                        'lists._id': 1,
-                        'lists.title': 1,
-                        'boards._id': 1,
-                        'boards.title': 1,
-                        'teams._id': 1,
-                        'teams.teamName': 1
+                    $facet : {
+                        cards: queryArr
                     }
                 }
             ])
