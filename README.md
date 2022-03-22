@@ -4,6 +4,9 @@ Project of Glints Final Project named Whiteboard which is similar to kanban boar
 ## API Documentation 
 https://documenter.getpostman.com/view/19565138/UVeNoPP3
 
+## Frontend Link :
+https://mywhiteboards.herokuapp.com/
+
 ## Backend Tech Stacks :
 - Express.js Framework
 - Cloudinary Cloud Storage
@@ -12,3 +15,4 @@ https://documenter.getpostman.com/view/19565138/UVeNoPP3
 - MongoDB Database
 - Mongoose ODM
 - Jest Unit Test (Not Done Yet)
+- Heroku Deploy
